@@ -13,7 +13,7 @@ class Player extends FlxSpriteGroup {
 	public function new():Void {
 		super();
 		
-		var rawSpriteData = Assets.getBitmapData("assets/images/cat.png");
+		var rawSpriteData = Assets.getBitmapData("assets/images/cat_8.png");
 		
 		var mx:Matrix = new Matrix();
 		mx.scale(Tile.TILE_SCALE, Tile.TILE_SCALE);
@@ -23,10 +23,10 @@ class Player extends FlxSpriteGroup {
 		_sprite = new FlxSprite();
 		_sprite.loadGraphic(spriteData, true, Tile.TILE_WIDTH * Tile.TILE_SCALE, Tile.TILE_HEIGHT * Tile.TILE_SCALE);
 		
-		_sprite.animation.add("l", [3], 3, false);
-		_sprite.animation.add("r", [2], 3, false);
-		_sprite.animation.add("u", [1], 3, false);
-		_sprite.animation.add("d", [0], 3, false);
+		_sprite.animation.add("l", [3, 7], 3, false);
+		_sprite.animation.add("r", [2, 6], 3, false);
+		_sprite.animation.add("u", [1, 5], 3, false);
+		_sprite.animation.add("d", [0, 4], 3, false);
 		_sprite.animation.add("stand", [0], 3, false);
 		
 		add(_sprite);
