@@ -23,6 +23,9 @@ class Tile extends FlxSpriteGroup {
 	public var bgDisplayData:BitmapData;
 	public var fgDisplayData:BitmapData;
 	
+	public var widthInTiles:Int;
+	public var heightInTiles:Int;
+	
 	public var tileCount:Map<Int, Int>;
 	
 	public var worldObjects:Array<WorldObject>;
@@ -30,6 +33,9 @@ class Tile extends FlxSpriteGroup {
 	
 	public function new(tileObject:Object):Void {
 		super();
+		
+		widthInTiles = 10;
+		heightInTiles = 10;
 		
 		this.tileObject = tileObject;
 		worldObjects = new Array<WorldObject>();
@@ -175,6 +181,24 @@ class Tile extends FlxSpriteGroup {
 		}
 	}
 	
+	public function getObjectAtLoc(loc:Object):WorldObject {
+		for (worldObject in worldObjects) {
+			if (worldObject.localX == loc.x && worldObject.localY == loc.y) {
+				return worldObject;
+			}
+		}
+		return null;
+	}
+	
+	public function removeObjectsAtLoc(loc:Object) {
+		for (worldObject in worldObjects) {
+			if (worldObject.localX == loc.x && worldObject.localY == loc.y) {
+				worldObjectsLayer.remove(worldObject);
+				worldObjects.remove(worldObject);
+			}
+		}
+	}
+	
 	public function removeObjectsOfType(type:String) {
 		var i:Int = worldObjects.length - 1;
 		while (i >= 0) {
@@ -193,9 +217,28 @@ class Tile extends FlxSpriteGroup {
 		return tileCount[value];
 	}
 	
-	public function isPathable(loc:Object):Bool {
+	public function isInBounds(loc:Object) {
+		return loc.x >= 0 && loc.y >= 0 && loc.x < widthInTiles && loc.y < heightInTiles;
+	}
+	
+	public function isPathableFGOnly(loc:Object):Bool {
+		if (!isInBounds(loc)) {
+			return false;
+		}
 		var squareObj = getSquare(loc);
-		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg) || squareObj.object != null) {
+		if (TiledMapManager.get().isSolid(squareObj.fg) || (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
+			return false;
+		}
+		return true;
+	}
+
+	public function isPathable(loc:Object):Bool {
+		if (!isInBounds(loc)) {
+			return false;
+		}
+		var squareObj = getSquare(loc);
+		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg) ||
+		    (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
 			return false;
 		}
 		return true;

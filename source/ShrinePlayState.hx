@@ -13,6 +13,8 @@ class ShrinePlayState extends AbstractPlayState {
 		
 		tileCoords = {x: WorldConstants.shrineInfo[shrineID].tx_start, y: WorldConstants.shrineInfo[shrineID].ty_start};
 		localTileCoords = {x: WorldConstants.shrineInfo[shrineID].x_start, y: WorldConstants.shrineInfo[shrineID].y_start};
+		respawnTileCoords = Utilities.cloneDirection(localTileCoords);
+
 		currentTile = new Tile(TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
 		
 		backgroundLayer.add(currentTile);

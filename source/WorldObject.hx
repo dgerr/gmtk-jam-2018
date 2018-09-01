@@ -24,6 +24,16 @@ class WorldObject extends FlxSpriteGroup {
 		
 		add(sp);
 	}
+	
+	public static function isSolid(worldObject:WorldObject) {
+		if (worldObject.type == "fireball") return false;
+		
+		return true;
+	}
+	
+	public static function isPushable(worldObject:WorldObject) {
+		return worldObject.type == "crate" || worldObject.type == "playerCrate";
+	}
 
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
