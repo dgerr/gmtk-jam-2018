@@ -1,4 +1,5 @@
 package;
+
 import openfl.utils.Object;
 
 class GameState {
@@ -19,6 +20,7 @@ class GameState {
 	public function new() {
 		shrineProgress = new Map<String, Int>();
 		
-		overworldPosition = {tx: 1, ty: 1, x: 4, y: 4};
+		//overworldPosition = {tx: 1, ty: 1, x: 4, y: 4};
+		overworldPosition = {tx: 2, ty: 0, x: 7, y: 6};
 	}
 }

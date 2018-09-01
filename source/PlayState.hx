@@ -1,11 +1,15 @@
 package;
 
+import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.FlxG;
+import flixel.graphics.FlxGraphic;
 import flixel.group.FlxSpriteGroup;
+import flixel.util.FlxColor;
 import openfl.utils.Object;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.transition.FlxTransitionSprite.GraphicTransTileDiamond;
+import flixel.addons.transition.TransitionData;
 
 enum State {
 	Free;
@@ -35,6 +39,8 @@ class PlayState extends FlxTransitionableState {
 	public var currentTile:Tile;
 	public var nextTile:Tile;
 	
+	public var animatingObject:WorldObject = null;
+	
 	
 	
 	override public function create():Void {
@@ -60,6 +66,21 @@ class PlayState extends FlxTransitionableState {
 		backgroundLayer.add(currentTile);
 		
 		snapPlayerToTile();
+		
+		FlxTransitionableState.defaultTransIn = new TransitionData();
+		FlxTransitionableState.defaultTransOut = new TransitionData();
+		
+		var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
+		diamond.persist = true;
+		diamond.destroyOnNoUse = false;
+		
+		FlxTransitionableState.defaultTransIn.color = FlxColor.BLACK;
+		FlxTransitionableState.defaultTransOut.color = FlxColor.BLACK;
+		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.TILES;
+		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.TILES;
+		FlxTransitionableState.defaultTransIn.tileData = { asset: diamond, width: 32, height: 32 };
+		FlxTransitionableState.defaultTransOut.tileData = { asset: diamond, width: 32, height: 32 };
+		transOut = FlxTransitionableState.defaultTransOut;
 	}
 	
 	private function snapPlayerToTile() {
@@ -74,16 +95,25 @@ class PlayState extends FlxTransitionableState {
 		if (localTileCoords.x >= 0 && localTileCoords.y >= 0 &&
 		    localTileCoords.x < 10 && localTileCoords.y < 10) {
 			var tileObject = currentTile.getSquare(localTileCoords);
-			if (!TiledMapManager.get().isSolid(tileObject.bg) && !TiledMapManager.get().isSolid(tileObject.fg)) {
-				state = State.PlayerMoving;
-				animFrames = FRAMES_BETWEEN_TILE_MOVE;
-			} else {
+			if (TiledMapManager.get().isSolid(tileObject.bg) || TiledMapManager.get().isSolid(tileObject.fg)) {
 				// collision with solid object
 				state = State.Free;
 				localTileCoords.x -= direction.x;
 				localTileCoords.y -= direction.y;
 				return;
 			}
+			if (tileObject.object != null) {
+				if (!currentTile.isPathable({x: localTileCoords.x + direction.x, y: localTileCoords.y + direction.y})) {
+					state = State.Free;
+					localTileCoords.x -= direction.x;
+					localTileCoords.y -= direction.y;
+					return;
+				} else {
+					animatingObject = tileObject.object;
+				}
+			}
+			state = State.PlayerMoving;
+			animFrames = FRAMES_BETWEEN_TILE_MOVE;
 		} else {
 			startShift();
 		}
@@ -131,7 +161,16 @@ class PlayState extends FlxTransitionableState {
 			
 			p.x += direction.x * amtToMove;
 			p.y += direction.y * amtToMove;
+			if (animatingObject != null) {
+				animatingObject.x += direction.x * amtToMove;
+				animatingObject.y += direction.y * amtToMove;
+			}
 			if (animFrames == 0) {
+				if (animatingObject != null) {
+					animatingObject.localX += direction.x;
+					animatingObject.localY += direction.y;
+					animatingObject = null;
+				}
 				state = State.Resolving;
 				snapPlayerToTile();
 				resolveMove();
@@ -144,18 +183,39 @@ class PlayState extends FlxTransitionableState {
 			return;
 		}
 		var tileInfo = currentTile.getSquare(localTileCoords);
+		var passedChecks = true;
 		
+		// check red squares
 		if (tileInfo.bg == 289) {
 			currentTile.setSquare(localTileCoords, 290);
 			
-			if (currentTile.getNumTiles(289) == 0) {
-				currentTile.changeAllSquares(292, 291);
+			if (currentTile.getNumTiles(289) > 0) {
+				passedChecks = false;
 			}
+		}
+		
+		// check switches
+		if (currentTile.getNumTiles(294) > 0) {
+			for (i in 0...currentTile.tileObject.bg.length) {
+				for (j in 0...currentTile.tileObject.bg[i].length) {
+					if (currentTile.tileObject.fg[i][j] == 294 && (currentTile.isPathable({x: j, y: i}) && (localTileCoords.x != j || localTileCoords.y != i))) {
+						passedChecks = false;
+						break;
+					}
+				}
+			}
+		}
+		
+		if (passedChecks) {
+			currentTile.changeAllSquares(292, 23);
+		} else {
+			currentTile.changeAllSquares(23, 292);
 		}
 
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
 			    localTileCoords.x == shrineLocation.x && localTileCoords.y == shrineLocation.y) {
+				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: localTileCoords.x, y: localTileCoords.y - 1};
 				FlxG.switchState(new ShrinePlayState(shrineLocation.id));
 				state = State.Locked;
 			}
