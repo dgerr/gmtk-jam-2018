@@ -1,16 +1,13 @@
 package;
 
 import flixel.FlxSprite;
-import flixel.FlxState;
 import flixel.util.FlxColor;
-
-using flixel.util.FlxSpriteUtil;
 
 class Player extends FlxSprite {
 	public function new():Void {
 		super();
 		
-		makeGraphic(32, 32, FlxColor.RED);
+		makeGraphic(Tile.TILE_WIDTH * Tile.TILE_SCALE, Tile.TILE_HEIGHT * Tile.TILE_SCALE, FlxColor.RED);
 	}
 
 	override public function update(elapsed:Float):Void {
