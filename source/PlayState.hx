@@ -46,7 +46,7 @@ class PlayState extends FlxTransitionableState {
 	
 	public var animatingObject:WorldObject = null;
 	
-		override public function create():Void {
+	override public function create():Void {
 		super.create();
 		
 		backgroundLayer = new FlxSpriteGroup();
