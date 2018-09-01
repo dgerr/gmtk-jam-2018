@@ -183,7 +183,8 @@ class AbstractPlayState extends FlxTransitionableState {
 			}
 			if (animFrames == 0) {
 				for (i in 0...animatingObjects.length) {
-					var newLoc:Object = {x: animatingObjects[i].localX + animatingDirections[i].x, y: animatingObjects[i].localY + animatingDirections[i].y};
+					var newLoc:Object = {x: animatingObjects[i].localX + animatingDirections[i].x,
+					                     y: animatingObjects[i].localY + animatingDirections[i].y};
 					currentTile.removeObjectsAtLoc(newLoc);
 					
 					animatingObjects[i].localX += animatingDirections[i].x;
