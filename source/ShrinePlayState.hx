@@ -33,6 +33,8 @@ class ShrinePlayState extends PlayState {
 		if (state != PlayState.State.Resolving) {
 			return;
 		}
+		super.resolveMove();
+		
 		var tileInfo = currentTile.getSquare(localTileCoords);
 		var passedChecks = true;
 		
@@ -72,7 +74,7 @@ class ShrinePlayState extends PlayState {
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
 			    localTileCoords.x == shrineLocation.x && localTileCoords.y == shrineLocation.y) {
-				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: localTileCoords.x, y: localTileCoords.y - 1};
+				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: localTileCoords.x, y: localTileCoords.y + 1};
 				FlxG.switchState(new ShrinePlayState(shrineLocation.id));
 				state = PlayState.State.Locked;
 			}

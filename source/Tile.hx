@@ -14,11 +14,12 @@ class Tile extends FlxSpriteGroup {
 	public static inline var TILE_HEIGHT:Int = 16;
 	public static inline var TILE_SCALE:Int = 4;
 	
+	public static inline var REAL_TILE_WIDTH:Int = TILE_WIDTH * TILE_SCALE;
+	public static inline var REAL_TILE_HEIGHT:Int = TILE_HEIGHT * TILE_SCALE;
+	
 	public static inline var NUM_TILES_PER_TILEMAP_ROW = 24;
 	public var tileObject:Object;
-	
-	public var srcBitmapData:BitmapData;
-	
+
 	public var bgDisplayData:BitmapData;
 	public var fgDisplayData:BitmapData;
 	
@@ -34,12 +35,12 @@ class Tile extends FlxSpriteGroup {
 		worldObjects = new Array<WorldObject>();
 		worldObjectsLayer = new FlxSpriteGroup();
 		
+		var srcBitmapData:BitmapData = TiledMapManager.get().tileBitmapData;
+		
 		var bg:Array<Array<Int>> = tileObject.bg;
 		var fg:Array<Array<Int>> = tileObject.fg;
 		
 		tileCount = new Map<Int, Int>();
-		
-		srcBitmapData = Assets.getBitmapData("assets/images/tiles.png");
 		
 		var blit:BitmapData = new BitmapData(TILE_WIDTH * 10, TILE_HEIGHT * 10);
 		var blit2:BitmapData = new BitmapData(TILE_WIDTH * 10, TILE_HEIGHT * 10, true, 0);
@@ -51,28 +52,17 @@ class Tile extends FlxSpriteGroup {
 		
 		for (i in 0...bg.length) {
 			for (j in 0...bg[i].length) {
-				blit.copyPixels(srcBitmapData, new Rectangle(TILE_WIDTH * (bg[i][j] % NUM_TILES_PER_TILEMAP_ROW),
-				                                             TILE_HEIGHT * Std.int(bg[i][j] / NUM_TILES_PER_TILEMAP_ROW),
-				                                             TILE_WIDTH,
-															 TILE_HEIGHT),
+				blit.copyPixels(srcBitmapData, TiledMapManager.getRectangleOfValue(bg[i][j]),
 								new Point(TILE_HEIGHT * j, TILE_WIDTH * i));
 				
 				if (WorldConstants.specialTileTypes.exists(fg[i][j])) {
 					var tileData:BitmapData = new BitmapData(TILE_WIDTH, TILE_HEIGHT, true, 0);
-					tileData.copyPixels(srcBitmapData, new Rectangle(TILE_HEIGHT * (fg[i][j] % NUM_TILES_PER_TILEMAP_ROW),
-																     TILE_WIDTH * Std.int(fg[i][j] / NUM_TILES_PER_TILEMAP_ROW),
-																     TILE_WIDTH,
-																     TILE_HEIGHT),
+					tileData.copyPixels(srcBitmapData, TiledMapManager.getRectangleOfValue(fg[i][j]),
 									    new Point(0, 0), null, null, true);
-					var scaledTileData:BitmapData = new BitmapData(TILE_WIDTH * TILE_SCALE, TILE_HEIGHT * TILE_SCALE, true, 0);
+					var scaledTileData:BitmapData = new BitmapData(REAL_TILE_WIDTH, REAL_TILE_HEIGHT, true, 0);
 					scaledTileData.draw(tileData, mx);
-					var worldObject:WorldObject = new WorldObject(scaledTileData, WorldConstants.specialTileTypes[fg[i][j]]);
-					worldObject.localX = j;
-					worldObject.localY = i;
-					worldObjects.push(worldObject);
-					worldObjectsLayer.add(worldObject);
-					worldObject.x = TILE_WIDTH * TILE_SCALE * j;
-					worldObject.y = TILE_HEIGHT * TILE_SCALE * i;
+					var worldObject:WorldObject = new WorldObject(scaledTileData, WorldConstants.specialTileTypes[fg[i][j]], tileObject.params[i][j]);
+					addWorldObject(worldObject);
 					fg[i][j] = -1;
 				} else {
 					blit2.copyPixels(srcBitmapData, new Rectangle(TILE_HEIGHT * (fg[i][j] % NUM_TILES_PER_TILEMAP_ROW),
@@ -138,16 +128,13 @@ class Tile extends FlxSpriteGroup {
 		
 		var blit:BitmapData = new BitmapData(TILE_WIDTH, TILE_HEIGHT, true, 0);
 		if (layer == "bg") {
-			bgDisplayData.fillRect(new Rectangle(TILE_WIDTH * TILE_SCALE * loc.x, TILE_HEIGHT * TILE_SCALE * loc.y, TILE_WIDTH * TILE_SCALE, TILE_HEIGHT * TILE_SCALE), 0);
+			bgDisplayData.fillRect(new Rectangle(REAL_TILE_WIDTH * loc.x, REAL_TILE_HEIGHT * loc.y, REAL_TILE_WIDTH, REAL_TILE_HEIGHT), 0);
 		} else if (layer == "fg") {
-			fgDisplayData.fillRect(new Rectangle(TILE_WIDTH * TILE_SCALE * loc.x, TILE_HEIGHT * TILE_SCALE * loc.y, TILE_WIDTH * TILE_SCALE, TILE_HEIGHT * TILE_SCALE), 0);
+			fgDisplayData.fillRect(new Rectangle(REAL_TILE_WIDTH * loc.x, REAL_TILE_HEIGHT * loc.y, REAL_TILE_WIDTH, REAL_TILE_HEIGHT), 0);
 		}
 		if (value >= 0) {
-			blit.copyPixels(srcBitmapData, new Rectangle(TILE_WIDTH * (value % NUM_TILES_PER_TILEMAP_ROW),
-														 TILE_HEIGHT * Std.int(value / NUM_TILES_PER_TILEMAP_ROW),
-														 TILE_WIDTH,
-														 TILE_HEIGHT),
-							new Point(0, 0));
+			var srcBitmapData:BitmapData = TiledMapManager.get().tileBitmapData;
+			blit.copyPixels(srcBitmapData, TiledMapManager.getRectangleOfValue(value), new Point(0, 0));
 		}
 		var mx:Matrix = new Matrix();
 		mx.translate(TILE_WIDTH * loc.x, TILE_HEIGHT * loc.y);
@@ -187,5 +174,12 @@ class Tile extends FlxSpriteGroup {
 			return false;
 		}
 		return true;
+	}
+	
+	public function addWorldObject(worldObject:WorldObject) {
+		worldObjects.push(worldObject);
+		worldObjectsLayer.add(worldObject);
+		worldObject.x = REAL_TILE_WIDTH * worldObject.localX;
+		worldObject.y = REAL_TILE_HEIGHT * worldObject.localY;
 	}
 }

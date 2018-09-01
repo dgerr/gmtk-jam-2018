@@ -39,6 +39,7 @@ class PlayState extends FlxTransitionableState {
 	
 	public var currentTile:Tile;
 	public var nextTile:Tile;
+	public var frameNumber:Int = 0;
 	
 	public var animatingObject:WorldObject = null;
 	
@@ -123,6 +124,7 @@ class PlayState extends FlxTransitionableState {
 				p._sprite.animation.play("u");
 			}
 			state = State.PlayerMoving;
+			frameNumber += 1;
 			animFrames = FRAMES_BETWEEN_TILE_MOVE;
 		} else {
 			startShift();
@@ -192,39 +194,6 @@ class PlayState extends FlxTransitionableState {
 		if (state != State.Resolving) {
 			return;
 		}
-		var tileInfo = currentTile.getSquare(localTileCoords);
-		var passedChecks = true;
-		
-		// check red squares
-		if (tileInfo.bg == 289) {
-			currentTile.setSquare(localTileCoords, 290);
-			
-			if (currentTile.getNumTiles(289) > 0) {
-				passedChecks = false;
-			}
-		}
-		
-		// check switches
-		if (currentTile.getNumTiles(294) > 0) {
-			for (i in 0...currentTile.tileObject.bg.length) {
-				for (j in 0...currentTile.tileObject.bg[i].length) {
-					if (currentTile.tileObject.fg[i][j] == 294 && (currentTile.isPathable({x: j, y: i}) && (localTileCoords.x != j || localTileCoords.y != i))) {
-						passedChecks = false;
-						break;
-					}
-				}
-			}
-		}
-		
-		if (passedChecks) {
-			currentTile.changeAllSquares(292, 23);
-		} else {
-			currentTile.changeAllSquares(23, 292);
-		}
-		
-		if (tileInfo.fg == 312) {
-			
-		}
 
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
@@ -234,7 +203,38 @@ class PlayState extends FlxTransitionableState {
 				state = State.Locked;
 			}
 		}
+		
 		if (state == State.Resolving) {
+			for (worldObject in currentTile.worldObjects) {
+				if (worldObject.type == "fireball") {
+					if (worldObject.params.get("direction") == "east") {
+						worldObject.x += Tile.REAL_TILE_WIDTH;
+						worldObject.localX += 1;
+					} else if (worldObject.params.get("direction") == "south") {
+						worldObject.y += Tile.REAL_TILE_HEIGHT;
+						worldObject.localY += 1;
+					}else if (worldObject.params.get("direction") == "west") {
+						worldObject.x -= Tile.REAL_TILE_HEIGHT;
+						worldObject.localX -= 1;
+					}else if (worldObject.params.get("direction") == "north") {
+						worldObject.y -= Tile.REAL_TILE_HEIGHT;
+						worldObject.localY -= 1;
+					}
+				}
+			}
+			
+			for (worldObject in currentTile.worldObjects) {
+				if (worldObject.type == "cannon") {
+					if ((frameNumber + Std.parseInt(worldObject.params.get("offset"))) % Std.parseInt(worldObject.params.get("frequency")) == 0) {
+						var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297), "fireball",
+															 ["x" => Std.string(worldObject.localX + 1),
+															  "y" => Std.string(worldObject.localY),
+															  "direction" => worldObject.params.get("direction")]);
+						currentTile.addWorldObject(wo);
+					}
+				}
+			}
+			
 			state = State.Free;
 		}
 	}
