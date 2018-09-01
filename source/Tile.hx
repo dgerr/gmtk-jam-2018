@@ -60,7 +60,21 @@ class Tile extends FlxSpriteGroup {
 					tileData.copyPixels(srcBitmapData, TiledMapManager.getRectangleOfValue(fg[i][j]),
 									    new Point(0, 0), null, null, true);
 					var scaledTileData:BitmapData = new BitmapData(REAL_TILE_WIDTH, REAL_TILE_HEIGHT, true, 0);
-					scaledTileData.draw(tileData, mx);
+					var mx2 = new Matrix();
+					mx2.translate( -TILE_WIDTH / 2, -TILE_HEIGHT / 2);
+					if (tileObject.params[i][j].exists("direction")) {
+						var dir = tileObject.params[i][j].get("direction");
+						if (dir == "north") {
+							mx2.rotate(3 * Math.PI / 2);
+						} else if (dir == "west") {
+							mx2.rotate(Math.PI);
+						} else if (dir == "south") {
+							mx2.rotate(Math.PI / 2);
+						}
+					}
+					mx2.translate(TILE_WIDTH / 2, TILE_HEIGHT / 2);
+					mx2.scale(TILE_SCALE, TILE_SCALE);
+					scaledTileData.draw(tileData, mx2);
 					var worldObject:WorldObject = new WorldObject(scaledTileData, WorldConstants.specialTileTypes[fg[i][j]], tileObject.params[i][j]);
 					addWorldObject(worldObject);
 					fg[i][j] = -1;

@@ -89,12 +89,22 @@ class TiledMapManager {
 		}
 	}
 	
-	public function getTileBitmapData(value:Int):BitmapData {
+	public function getTileBitmapData(value:Int, ?direction:String = "east"):BitmapData {
 		var bitmapData:BitmapData = new BitmapData(Tile.TILE_WIDTH, Tile.TILE_HEIGHT, true, 0);
 		bitmapData.copyPixels(tileBitmapData, getRectangleOfValue(value), new Point(0, 0));
 		
 		var returnBitmapData:BitmapData = new BitmapData(Tile.TILE_WIDTH * Tile.TILE_SCALE, Tile.TILE_HEIGHT * Tile.TILE_SCALE, true, 0);
 		var mx:Matrix = new Matrix();
+		mx.translate( -Tile.TILE_WIDTH / 2, -Tile.TILE_HEIGHT / 2);
+		
+		if (direction == "north") {
+			mx.rotate(3 * Math.PI / 2);
+		} else if (direction == "west") {
+			mx.rotate(Math.PI);
+		} else if (direction == "south") {
+			mx.rotate(Math.PI / 2);
+		}
+		mx.translate(Tile.TILE_WIDTH / 2, Tile.TILE_HEIGHT / 2);
 		mx.scale(Tile.TILE_SCALE, Tile.TILE_SCALE);
 		returnBitmapData.draw(bitmapData, mx);
 		

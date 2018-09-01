@@ -1,6 +1,5 @@
 package;
 
-import flixel.FlxG;
 import flixel.FlxSprite;
 import openfl.Assets;
 import openfl.display.BitmapData;

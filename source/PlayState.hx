@@ -45,8 +45,6 @@ class PlayState extends FlxTransitionableState {
 	public var frameNumber:Int = 0;
 	
 	public var animatingObject:WorldObject = null;
-
-	public var particles:Array<FlxSprite>;
 	
 		override public function create():Void {
 		super.create();
@@ -54,8 +52,6 @@ class PlayState extends FlxTransitionableState {
 		backgroundLayer = new FlxSpriteGroup();
 		entityLayer = new FlxSpriteGroup();
 		particleLayer = new FlxSpriteGroup();
-		
-		particles = new Array<FlxSprite>();
 		
 		TiledMapManager.get().loadTileSet("world");
 		
@@ -208,7 +204,7 @@ class PlayState extends FlxTransitionableState {
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
 			    localTileCoords.x == shrineLocation.x && localTileCoords.y == shrineLocation.y) {
-				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: localTileCoords.x, y: localTileCoords.y - 1};
+				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: localTileCoords.x, y: localTileCoords.y + 1};
 				FlxG.switchState(new ShrinePlayState(shrineLocation.id));
 				state = State.Locked;
 			}
@@ -236,10 +232,12 @@ class PlayState extends FlxTransitionableState {
 			for (worldObject in currentTile.worldObjects) {
 				if (worldObject.type == "cannon") {
 					if ((frameNumber + Std.parseInt(worldObject.params.get("offset"))) % Std.parseInt(worldObject.params.get("frequency")) == 0) {
-						var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297), "fireball",
-															 ["x" => Std.string(worldObject.localX + 1),
-															  "y" => Std.string(worldObject.localY),
-															  "direction" => worldObject.params.get("direction")]);
+						var dirString = worldObject.params.get("direction");
+						var dir = Utilities.directionToObject(dirString);
+						var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297, dirString), "fireball",
+															 ["x" => Std.string(worldObject.localX + dir.x),
+															  "y" => Std.string(worldObject.localY + dir.y),
+															  "direction" => dirString]);
 						currentTile.addWorldObject(wo);
 					}
 				}
@@ -267,7 +265,6 @@ class PlayState extends FlxTransitionableState {
 				var p:Particle = new Particle("particles/smoke.png", wo.x - 10 + 20 * (i % 2), wo.y - 10 + 20 * Std.int(i / 2), 0.5,
 											  function(v) { v.y -= 0.5; v.alpha -= 0.1; });
 				particleLayer.add(p);
-				particles.push(p);
 			}
 		}
 		
@@ -327,12 +324,6 @@ class PlayState extends FlxTransitionableState {
 			snapPlayerToTile();
 		}
 	}
-	
-	public function animateParticles() {
-		for (particle in particles) {
-			
-		}
-	}
 
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
@@ -341,7 +332,5 @@ class PlayState extends FlxTransitionableState {
 		resolveMove();
 		resolveCast();
 		shiftTile();
-		
-		animateParticles();
 	}
 }
