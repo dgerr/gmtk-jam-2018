@@ -18,13 +18,15 @@ enum State {
 	EnemyMoving;
 	Resolving;
 	ShiftingTile;
+	CastingCane;
 	Locked;
 }
 class PlayState extends FlxTransitionableState {
 	
 	public var backgroundLayer:FlxSpriteGroup;
-	
 	public var entityLayer:FlxSpriteGroup;
+	public var particleLayer:FlxSpriteGroup;
+	
 	public var p:Player;
 	
 	public var state:State = State.Free;
@@ -42,14 +44,15 @@ class PlayState extends FlxTransitionableState {
 	public var frameNumber:Int = 0;
 	
 	public var animatingObject:WorldObject = null;
+
+	public var particles:Array<FlxSprite>;
 	
-	
-	
-	override public function create():Void {
+		override public function create():Void {
 		super.create();
 		
 		backgroundLayer = new FlxSpriteGroup();
 		entityLayer = new FlxSpriteGroup();
+		particleLayer = new FlxSpriteGroup();
 		
 		TiledMapManager.get().loadTileSet("world");
 		
@@ -60,6 +63,7 @@ class PlayState extends FlxTransitionableState {
 		
 		add(backgroundLayer);
 		add(entityLayer);
+		add(particleLayer);
 		
 		p = new Player();
 		
@@ -166,6 +170,9 @@ class PlayState extends FlxTransitionableState {
 				direction = {x: 1, y: 0};
 				startPlayerMove();
 			}
+			if (FlxG.keys.anyJustPressed([X]) && state == State.Free) {
+				state = State.CastingCane;
+			}
 		}
 		if (state == State.PlayerMoving) {
 			--animFrames;
@@ -239,6 +246,51 @@ class PlayState extends FlxTransitionableState {
 		}
 	}
 	
+	public function castCane() {
+		if (state != State.CastingCane) {
+			return;
+		}
+		var nx:Int = localTileCoords.x + direction.x;
+		var ny:Int = localTileCoords.y + direction.y;
+		
+		if (currentTile.isPathable({x: nx, y: ny})) {
+			currentTile.changeAllSquares(91, -1);
+			var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(91), "crate",
+												 ["x" => Std.string(nx),
+												  "y" => Std.string(ny)]);
+			currentTile.addWorldObject(wo);
+		}
+		
+		state = State.Free;
+	}
+	
+	public function resolveCast() {
+		if (state != State.CastingCane) {
+			return;
+		}
+		var _up = FlxG.keys.anyJustPressed([UP, W]);
+        var _down = FlxG.keys.anyJustPressed([DOWN, S]);
+        var _left = FlxG.keys.anyJustPressed([LEFT, A]);
+        var _right = FlxG.keys.anyJustPressed([RIGHT, D]);
+		
+		if (_up && !_down) {
+			direction = {x: 0, y: -1};
+			castCane();
+		}
+		if (!_up && _down) {
+			direction = {x: 0, y: 1};
+			castCane();
+		}
+		if (_left && !_right) {
+			direction = {x: -1, y: 0};
+			castCane();
+		}
+		if (!_left && _right) {
+			direction = {x: 1, y: 0};
+			castCane();
+		}
+	}
+	
 	public function shiftTile() {
 		if (state != State.ShiftingTile) {
 			return;
@@ -265,12 +317,21 @@ class PlayState extends FlxTransitionableState {
 			snapPlayerToTile();
 		}
 	}
+	
+	public function animateParticles() {
+		for (particle in particles) {
+			
+		}
+	}
 
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
 		
 		handleMovement();
 		resolveMove();
+		resolveCast();
 		shiftTile();
+		
+		animateParticles();
 	}
 }

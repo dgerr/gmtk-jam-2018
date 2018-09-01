@@ -110,7 +110,7 @@ class TiledMapManager {
 		var builtArray2:Array<Array<Int>> = new Array<Array<Int>>();
 		var builtParamsArray:Array<Array<Map<String, String>>> = new Array<Array<Map<String, String>>>();
 		
-		var sx = 11 * x + (path == "world" ? 2 : 0);
+		var sx = 11 * x;
 		var sy = 11 * y;
 		
 		for (i in 0...10) {
