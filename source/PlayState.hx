@@ -192,39 +192,6 @@ class PlayState extends FlxTransitionableState {
 		if (state != State.Resolving) {
 			return;
 		}
-		var tileInfo = currentTile.getSquare(localTileCoords);
-		var passedChecks = true;
-		
-		// check red squares
-		if (tileInfo.bg == 289) {
-			currentTile.setSquare(localTileCoords, 290);
-			
-			if (currentTile.getNumTiles(289) > 0) {
-				passedChecks = false;
-			}
-		}
-		
-		// check switches
-		if (currentTile.getNumTiles(294) > 0) {
-			for (i in 0...currentTile.tileObject.bg.length) {
-				for (j in 0...currentTile.tileObject.bg[i].length) {
-					if (currentTile.tileObject.fg[i][j] == 294 && (currentTile.isPathable({x: j, y: i}) && (localTileCoords.x != j || localTileCoords.y != i))) {
-						passedChecks = false;
-						break;
-					}
-				}
-			}
-		}
-		
-		if (passedChecks) {
-			currentTile.changeAllSquares(292, 23);
-		} else {
-			currentTile.changeAllSquares(23, 292);
-		}
-		
-		if (tileInfo.fg == 312) {
-			
-		}
 
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
@@ -234,7 +201,32 @@ class PlayState extends FlxTransitionableState {
 				state = State.Locked;
 			}
 		}
+		
 		if (state == State.Resolving) {
+			for (worldObject in currentTile.worldObjects) {
+				if (worldObject.type == "fireball") {
+					if (worldObject.params["direction"] == "right") {
+						worldObject.x += Tile.REAL_TILE_WIDTH;
+					} else if (worldObject.params["direction"] == "down") {
+						worldObject.y += Tile.REAL_TILE_HEIGHT;
+					}else if (worldObject.params["direction"] == "left") {
+						worldObject.x -= Tile.REAL_TILE_HEIGHT;
+					}else if (worldObject.params["direction"] == "up") {
+						worldObject.y -= Tile.REAL_TILE_HEIGHT;
+					}
+				}
+			}
+			
+			for (worldObject in currentTile.worldObjects) {
+				if (worldObject.type == "cannon") {
+					var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297), "fireball",
+					                                     ["x" => Std.string(worldObject.localX + 1),
+														  "y" => Std.string(worldObject.localY),
+														  "direction" => worldObject.params["direction"]]);
+					currentTile.addWorldObject(wo);
+				}
+			}
+			
 			state = State.Free;
 		}
 	}
