@@ -44,7 +44,8 @@ class AbstractPlayState extends FlxTransitionableState {
 	
 	public var currentTile:Tile;
 	public var nextTile:Tile;
-	public var frameNumber:Int = 0;
+	public var frameCount:Int = 0;
+	public var moveCount:Int = 0;
 	
 	public var animatingObjects:Array<WorldObject>;
 	public var animatingDirections:Array<Object>;
@@ -95,7 +96,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (localTileCoords.x >= 0 && localTileCoords.y >= 0 &&
 		    localTileCoords.x < 10 && localTileCoords.y < 10) {
 			var tileObject = currentTile.getSquare(localTileCoords);
-			if (!currentTile.isPathable(localTileCoords)) {
+			if (!currentTile.isTerrainPathable(localTileCoords)) {
 				// collision with solid object
 				state = State.Free;
 				localTileCoords.x -= direction.x;
@@ -127,7 +128,6 @@ class AbstractPlayState extends FlxTransitionableState {
 			animatingObjects.push(p);
 			animatingDirections.push(Utilities.cloneDirection(direction));
 			state = State.PlayerMoving;
-			frameNumber += 1;
 			animFrames = FRAMES_BETWEEN_TILE_MOVE;
 		} else {
 			startShift();
@@ -183,6 +183,9 @@ class AbstractPlayState extends FlxTransitionableState {
 			}
 			if (animFrames == 0) {
 				for (i in 0...animatingObjects.length) {
+					var newLoc:Object = {x: animatingObjects[i].localX + animatingDirections[i].x, y: animatingObjects[i].localY + animatingDirections[i].y};
+					currentTile.removeObjectsAtLoc(newLoc);
+					
 					animatingObjects[i].localX += animatingDirections[i].x;
 					animatingObjects[i].localY += animatingDirections[i].y;
 				}
@@ -204,6 +207,7 @@ class AbstractPlayState extends FlxTransitionableState {
 			return;
 		}
 
+		moveCount += 1;
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
 			    localTileCoords.x == shrineLocation.x && localTileCoords.y == shrineLocation.y) {
@@ -239,7 +243,7 @@ class AbstractPlayState extends FlxTransitionableState {
 			
 			for (worldObject in currentTile.worldObjects) {
 				if (worldObject.type == "cannon") {
-					if ((frameNumber + Std.parseInt(worldObject.params.get("offset"))) % Std.parseInt(worldObject.params.get("frequency")) == 0) {
+					if ((moveCount + Std.parseInt(worldObject.params.get("offset"))) % Std.parseInt(worldObject.params.get("frequency")) == 0) {
 						var dirString = worldObject.params.get("direction");
 						var dir = Utilities.directionToObject(dirString);
 						var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297, dirString), "fireball",
@@ -264,14 +268,17 @@ class AbstractPlayState extends FlxTransitionableState {
 		
 		if (currentTile.isPathable({x: nx, y: ny})) {
 			currentTile.removeObjectsOfType("playerCrate");
+			currentTile.removeObjectsAtLoc({x: nx, y: ny});
 			var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(91), "playerCrate",
 												 ["x" => Std.string(nx),
 												  "y" => Std.string(ny)]);
 			currentTile.addWorldObject(wo);
-			trace(wo.x + "," + wo.y);
 			
 			for (i in 0...4) {
-				var p:Particle = new Particle("particles/smoke.png", wo.x - 10 + 20 * (i % 2), wo.y - 10 + 20 * Std.int(i / 2), 0.5,
+				var p:Particle = new Particle("particles/smoke.png",
+				                              wo.x - 10 + 20 * (i % 2),
+											  wo.y - 10 + 20 * Std.int(i / 2),
+											  0.5,
 											  function(v) { v.y -= 0.5; v.alpha -= 0.1; });
 				particleLayer.add(p);
 			}
@@ -321,6 +328,8 @@ class AbstractPlayState extends FlxTransitionableState {
 		currentTile.y += dy;
 		nextTile.x += dx;
 		nextTile.y += dy;
+		particleLayer.x += dx;
+		particleLayer.y += dy;
 		p.x += dx * (1.0 - Tile.TILE_WIDTH / FRAMES_BETWEEN_TILE_SWITCH / Main.GAME_WIDTH);
 		p.y += dy * (1.0 - Tile.TILE_HEIGHT / FRAMES_BETWEEN_TILE_SWITCH / Main.GAME_HEIGHT);
 		
@@ -328,12 +337,35 @@ class AbstractPlayState extends FlxTransitionableState {
 			currentTile = nextTile;
 			currentTile.x = 0;
 			currentTile.y = 0;
+			particleLayer.x = 0;
+			particleLayer.y = 0;
+			for (particle in particleLayer) {
+				particle.destroy();
+			}
 			nextTile = null;
 			state = State.Free;
 			localTileCoords.x -= 10 * direction.x;
 			localTileCoords.y -= 10 * direction.y;
 			respawnTileCoords = Utilities.cloneDirection(localTileCoords);
 			snapPlayerToTile();
+		}
+	}
+	
+	public function spawnParticleEffects() {
+		if (frameCount % 2 == 0) {
+			for (row in 0...currentTile.tileObject.bg.length) {
+				for (col in 0...currentTile.tileObject.bg[row].length) {
+					if (currentTile.tileObject.fg[row][col] == 380) {
+						var p:Particle = new Particle("particles/sparkle.png",
+													  col * Tile.REAL_TILE_WIDTH + 0.1 * Tile.REAL_TILE_WIDTH + 0.8 * Std.random(Tile.REAL_TILE_WIDTH + 1),
+													  row * Tile.REAL_TILE_HEIGHT + 0.1 * Tile.REAL_TILE_HEIGHT + 0.9 * Std.random(Tile.REAL_TILE_HEIGHT + 1),
+													  2,
+													  function(v) { v.y -= 0.3; v.alpha -= 0.05; },
+													  {rows: 1, cols: 4, animation: [0, 1, 2, 3]});
+						particleLayer.add(p);
+					}
+				}
+			}
 		}
 	}
 	
@@ -349,5 +381,8 @@ class AbstractPlayState extends FlxTransitionableState {
 		startResolveMove();
 		resolveCast();
 		shiftTile();
+		
+		spawnParticleEffects();
+		++frameCount;
 	}
 }
