@@ -1,8 +1,9 @@
 package;
 
+import flixel.FlxG;
+import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.FlxG;
 import flixel.graphics.FlxGraphic;
 import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
@@ -111,6 +112,15 @@ class PlayState extends FlxTransitionableState {
 				} else {
 					animatingObject = tileObject.object;
 				}
+			}
+			if (direction.x == -1) {
+				p._sprite.animation.play("l");
+			} else if (direction.x == 1) {
+				p._sprite.animation.play("r");
+			} else if (direction.y == 1) {
+				p._sprite.animation.play("d");
+			} else {
+				p._sprite.animation.play("u");
 			}
 			state = State.PlayerMoving;
 			animFrames = FRAMES_BETWEEN_TILE_MOVE;

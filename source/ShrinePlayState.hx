@@ -30,7 +30,7 @@ class ShrinePlayState extends PlayState {
 	}
 	
 	public override function resolveMove() {
-		if (state != State.Resolving) {
+		if (state != PlayState.State.Resolving) {
 			return;
 		}
 		var tileInfo = currentTile.getSquare(localTileCoords);
@@ -74,11 +74,11 @@ class ShrinePlayState extends PlayState {
 			    localTileCoords.x == shrineLocation.x && localTileCoords.y == shrineLocation.y) {
 				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: localTileCoords.x, y: localTileCoords.y - 1};
 				FlxG.switchState(new ShrinePlayState(shrineLocation.id));
-				state = State.Locked;
+				state = PlayState.State.Locked;
 			}
 		}
-		if (state == State.Resolving) {
-			state = State.Free;
+		if (state == PlayState.State.Resolving) {
+			state = PlayState.State.Free;
 		}
 	}
 
