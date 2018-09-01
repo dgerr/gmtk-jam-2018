@@ -96,7 +96,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (localTileCoords.x >= 0 && localTileCoords.y >= 0 &&
 		    localTileCoords.x < 10 && localTileCoords.y < 10) {
 			var tileObject = currentTile.getSquare(localTileCoords);
-			if (!currentTile.isPathable(localTileCoords)) {
+			if (!currentTile.isTerrainPathable(localTileCoords)) {
 				// collision with solid object
 				state = State.Free;
 				localTileCoords.x -= direction.x;
@@ -128,7 +128,6 @@ class AbstractPlayState extends FlxTransitionableState {
 			animatingObjects.push(p);
 			animatingDirections.push(Utilities.cloneDirection(direction));
 			state = State.PlayerMoving;
-			moveCount += 1;
 			animFrames = FRAMES_BETWEEN_TILE_MOVE;
 		} else {
 			startShift();
@@ -184,6 +183,9 @@ class AbstractPlayState extends FlxTransitionableState {
 			}
 			if (animFrames == 0) {
 				for (i in 0...animatingObjects.length) {
+					var newLoc:Object = {x: animatingObjects[i].localX + animatingDirections[i].x, y: animatingObjects[i].localY + animatingDirections[i].y};
+					currentTile.removeObjectsAtLoc(newLoc);
+					
 					animatingObjects[i].localX += animatingDirections[i].x;
 					animatingObjects[i].localY += animatingDirections[i].y;
 				}
@@ -205,6 +207,7 @@ class AbstractPlayState extends FlxTransitionableState {
 			return;
 		}
 
+		moveCount += 1;
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
 			    localTileCoords.x == shrineLocation.x && localTileCoords.y == shrineLocation.y) {
@@ -265,11 +268,11 @@ class AbstractPlayState extends FlxTransitionableState {
 		
 		if (currentTile.isPathable({x: nx, y: ny})) {
 			currentTile.removeObjectsOfType("playerCrate");
+			currentTile.removeObjectsAtLoc({x: nx, y: ny});
 			var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(91), "playerCrate",
 												 ["x" => Std.string(nx),
 												  "y" => Std.string(ny)]);
 			currentTile.addWorldObject(wo);
-			trace(wo.x + "," + wo.y);
 			
 			for (i in 0...4) {
 				var p:Particle = new Particle("particles/smoke.png",

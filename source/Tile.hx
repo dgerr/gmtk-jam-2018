@@ -237,8 +237,15 @@ class Tile extends FlxSpriteGroup {
 			return false;
 		}
 		var squareObj = getSquare(loc);
-		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg) ||
-		    (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
+		if (!isTerrainPathable(loc) || (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
+			return false;
+		}
+		return true;
+	}
+	
+	public function isTerrainPathable(loc:Object):Bool {
+		var squareObj = getSquare(loc);
+		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg)) {
 			return false;
 		}
 		return true;
