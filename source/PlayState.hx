@@ -1,5 +1,6 @@
 package;
 
+import flash.display.BitmapData;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -53,6 +54,8 @@ class PlayState extends FlxTransitionableState {
 		backgroundLayer = new FlxSpriteGroup();
 		entityLayer = new FlxSpriteGroup();
 		particleLayer = new FlxSpriteGroup();
+		
+		particles = new Array<FlxSprite>();
 		
 		TiledMapManager.get().loadTileSet("world");
 		
@@ -254,11 +257,18 @@ class PlayState extends FlxTransitionableState {
 		var ny:Int = localTileCoords.y + direction.y;
 		
 		if (currentTile.isPathable({x: nx, y: ny})) {
-			currentTile.changeAllSquares(91, -1);
-			var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(91), "crate",
+			currentTile.removeObjectsOfType("playerCrate");
+			var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(91), "playerCrate",
 												 ["x" => Std.string(nx),
 												  "y" => Std.string(ny)]);
 			currentTile.addWorldObject(wo);
+			
+			for (i in 0...4) {
+				var p:Particle = new Particle("particles/smoke.png", wo.x - 10 + 20 * (i % 2), wo.y - 10 + 20 * Std.int(i / 2), 0.5,
+											  function(v) { v.y -= 0.5; v.alpha -= 0.1; });
+				particleLayer.add(p);
+				particles.push(p);
+			}
 		}
 		
 		state = State.Free;

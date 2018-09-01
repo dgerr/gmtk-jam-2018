@@ -161,6 +161,17 @@ class Tile extends FlxSpriteGroup {
 		}
 	}
 	
+	public function removeObjectsOfType(type:String) {
+		var i:Int = worldObjects.length - 1;
+		while (i >= 0) {
+			if (worldObjects[i].type == type) {
+				worldObjectsLayer.remove(worldObjects[i]);
+				worldObjects.splice(i, 1);
+			}
+			--i;
+		}
+	}
+	
 	public function getNumTiles(value:Int) {
 		if (!tileCount.exists(value)) {
 			return 0;
