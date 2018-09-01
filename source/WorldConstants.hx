@@ -10,4 +10,7 @@ class WorldConstants {
 	public static var shrineInfo:Map<String, Object> =
 		["shrine1" => {tx_start: 0, ty_start: 2, x_start: 4, y_start: 9},
 		 "shrine2" => {tx_start: 0, ty_start: 2, x_start: 4, y_start: 9}];
+	
+	public static var specialTileTypes:Map<Int, String> =
+		[ 67 => "crate" ];
 }
