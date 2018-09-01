@@ -211,6 +211,10 @@ class PlayState extends FlxTransitionableState {
 		} else {
 			currentTile.changeAllSquares(23, 292);
 		}
+		
+		if (tileInfo.fg == 312) {
+			
+		}
 
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&

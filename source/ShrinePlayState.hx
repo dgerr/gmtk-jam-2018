@@ -28,6 +28,59 @@ class ShrinePlayState extends PlayState {
 		
 		snapPlayerToTile();
 	}
+	
+	public override function resolveMove() {
+		if (state != State.Resolving) {
+			return;
+		}
+		var tileInfo = currentTile.getSquare(localTileCoords);
+		var passedChecks = true;
+		
+		// check red squares
+		if (tileInfo.bg == 289) {
+			currentTile.setSquare(localTileCoords, 290);
+			
+			if (currentTile.getNumTiles(289) > 0) {
+				passedChecks = false;
+			}
+		}
+		
+		// check switches
+		if (currentTile.getNumTiles(294) > 0) {
+			for (i in 0...currentTile.tileObject.bg.length) {
+				for (j in 0...currentTile.tileObject.bg[i].length) {
+					if (currentTile.tileObject.fg[i][j] == 294 && (currentTile.isPathable({x: j, y: i}) && (localTileCoords.x != j || localTileCoords.y != i))) {
+						passedChecks = false;
+						break;
+					}
+				}
+			}
+		}
+		
+		if (passedChecks) {
+			currentTile.changeAllSquares(292, 23);
+		} else {
+			currentTile.changeAllSquares(23, 292);
+		}
+		
+		if (tileInfo.fg == 312) {
+			GameState.get().shrineProgress[shrineID] = 100;
+			state = PlayState.State.Locked;
+			FlxG.switchState(new PlayState());
+		}
+
+		for (shrineLocation in WorldConstants.shrineLocationMap) {
+			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
+			    localTileCoords.x == shrineLocation.x && localTileCoords.y == shrineLocation.y) {
+				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: localTileCoords.x, y: localTileCoords.y - 1};
+				FlxG.switchState(new ShrinePlayState(shrineLocation.id));
+				state = State.Locked;
+			}
+		}
+		if (state == State.Resolving) {
+			state = State.Free;
+		}
+	}
 
 	private override function startShift() {
 		tileCoords.x += direction.x;
