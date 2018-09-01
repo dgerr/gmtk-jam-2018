@@ -19,11 +19,11 @@ class ShrinePlayState extends AbstractPlayState {
 		snapPlayerToTile();
 	}
 	
-	public override function resolveMove() {
-		if (state != State.Resolving) {
+	public override function startResolveMove() {
+		if (state != State.StartResolving) {
 			return;
 		}
-		super.resolveMove();
+		super.startResolveMove();
 		
 		var tileInfo = currentTile.getSquare(localTileCoords);
 		var passedChecks = true;
@@ -68,7 +68,7 @@ class ShrinePlayState extends AbstractPlayState {
 				state = State.Locked;
 			}
 		}
-		if (state == State.Resolving) {
+		if (state == State.StartResolving) {
 			state = State.Free;
 		}
 	}

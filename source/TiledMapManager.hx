@@ -93,7 +93,7 @@ class TiledMapManager {
 		var bitmapData:BitmapData = new BitmapData(Tile.TILE_WIDTH, Tile.TILE_HEIGHT, true, 0);
 		bitmapData.copyPixels(tileBitmapData, getRectangleOfValue(value), new Point(0, 0));
 		
-		var returnBitmapData:BitmapData = new BitmapData(Tile.TILE_WIDTH * Tile.TILE_SCALE, Tile.TILE_HEIGHT * Tile.TILE_SCALE, true, 0);
+		var returnBitmapData:BitmapData = new BitmapData(Tile.REAL_TILE_WIDTH, Tile.REAL_TILE_HEIGHT, true, 0);
 		var mx:Matrix = new Matrix();
 		mx.translate( -Tile.TILE_WIDTH / 2, -Tile.TILE_HEIGHT / 2);
 		
