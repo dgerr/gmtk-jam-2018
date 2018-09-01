@@ -39,6 +39,7 @@ class PlayState extends FlxTransitionableState {
 	
 	public var currentTile:Tile;
 	public var nextTile:Tile;
+	public var frameNumber:Int = 0;
 	
 	public var animatingObject:WorldObject = null;
 	
@@ -123,6 +124,7 @@ class PlayState extends FlxTransitionableState {
 				p._sprite.animation.play("u");
 			}
 			state = State.PlayerMoving;
+			frameNumber += 1;
 			animFrames = FRAMES_BETWEEN_TILE_MOVE;
 		} else {
 			startShift();
@@ -205,25 +207,31 @@ class PlayState extends FlxTransitionableState {
 		if (state == State.Resolving) {
 			for (worldObject in currentTile.worldObjects) {
 				if (worldObject.type == "fireball") {
-					if (worldObject.params["direction"] == "right") {
+					if (worldObject.params.get("direction") == "east") {
 						worldObject.x += Tile.REAL_TILE_WIDTH;
-					} else if (worldObject.params["direction"] == "down") {
+						worldObject.localX += 1;
+					} else if (worldObject.params.get("direction") == "south") {
 						worldObject.y += Tile.REAL_TILE_HEIGHT;
-					}else if (worldObject.params["direction"] == "left") {
+						worldObject.localY += 1;
+					}else if (worldObject.params.get("direction") == "west") {
 						worldObject.x -= Tile.REAL_TILE_HEIGHT;
-					}else if (worldObject.params["direction"] == "up") {
+						worldObject.localX -= 1;
+					}else if (worldObject.params.get("direction") == "north") {
 						worldObject.y -= Tile.REAL_TILE_HEIGHT;
+						worldObject.localY -= 1;
 					}
 				}
 			}
 			
 			for (worldObject in currentTile.worldObjects) {
 				if (worldObject.type == "cannon") {
-					var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297), "fireball",
-					                                     ["x" => Std.string(worldObject.localX + 1),
-														  "y" => Std.string(worldObject.localY),
-														  "direction" => worldObject.params["direction"]]);
-					currentTile.addWorldObject(wo);
+					if ((frameNumber + Std.parseInt(worldObject.params.get("offset"))) % Std.parseInt(worldObject.params.get("frequency")) == 0) {
+						var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297), "fireball",
+															 ["x" => Std.string(worldObject.localX + 1),
+															  "y" => Std.string(worldObject.localY),
+															  "direction" => worldObject.params.get("direction")]);
+						currentTile.addWorldObject(wo);
+					}
 				}
 			}
 			

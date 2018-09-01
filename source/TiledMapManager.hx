@@ -6,6 +6,8 @@ import haxe.io.Eof;
 import openfl.Assets;
 import openfl.geom.Rectangle;
 import openfl.utils.Object;
+import sys.FileStat;
+import sys.FileSystem;
 import sys.io.File;
 
 class TiledMapManager {
@@ -48,7 +50,6 @@ class TiledMapManager {
 		
 		var fin = File.read("assets/data/" + path + "_background.csv");
 		var fin2 = File.read("assets/data/" + path + "_foreground.csv");
-		var params_fin = File.read("assets/data/" + path + "_params.csv");
 		
 		try {
 			while (true) {
@@ -69,18 +70,23 @@ class TiledMapManager {
 			}
 		} catch (e:Eof) { }
 		
-		try {
-				trace("!");
-			while (true) {
-				var line = params_fin.readLine().split(",");
-				var builtObject = new Map<String, String>();
-				for (pair in line) {
-					var pairSplit = pair.split(":");
-					builtObject[pairSplit[0]] = pairSplit[1];
+		var params_path = "assets/data/" + path + "_params.csv";
+		if (FileSystem.exists(params_path)) {
+			var params_fin = File.read(params_path);
+			try {
+				while (true) {
+					var line = params_fin.readLine().split(",");
+					if (line.length > 3) {
+						var builtObject = new Map<String, String>();
+						for (pair in line) {
+							var pairSplit = pair.split(":");
+							builtObject[pairSplit[0]] = pairSplit[1];
+						}
+						params.push(builtObject);
+					}
 				}
-				params.push(builtObject);
-			}
-		} catch (e:Eof) { }
+			} catch (e:Eof) { }
+		}
 	}
 	
 	public function getTileBitmapData(value:Int):BitmapData {
@@ -102,7 +108,7 @@ class TiledMapManager {
 		}
 		var builtArray:Array<Array<Int>> = new Array<Array<Int>>();
 		var builtArray2:Array<Array<Int>> = new Array<Array<Int>>();
-		var builtParamsArray:Array<Array<Object>> = new Array<Array<Object>>();
+		var builtParamsArray:Array<Array<Map<String, String>>> = new Array<Array<Map<String, String>>>();
 		
 		var sx = 11 * x + (path == "world" ? 2 : 0);
 		var sy = 11 * y;
@@ -112,13 +118,11 @@ class TiledMapManager {
 			builtArray2.push(tiledLayer2[sy + i].slice(sx, sx + 10));
 		}
 		for (i in 0...10) {
-			builtParamsArray.push(new Array<Object>());
+			builtParamsArray.push(new Array<Map<String, String>>());
 			for (j in 0...10) {
-				builtParamsArray[i].push({});
-				trace("!");
+				builtParamsArray[i].push(["x" => Std.string(j), "y" => Std.string(i)]);
 				for (param in params) {
-					if (Std.parseInt(param["tx"]) == x && Std.parseInt(param["ty"]) == y &&
-					    Std.parseInt(param["x"]) == sx + j && Std.parseInt(param["y"]) == sy + i) {
+					if (Std.parseInt(param["tx"]) == x && Std.parseInt(param["ty"]) == y && Std.parseInt(param["x"]) == j && Std.parseInt(param["y"]) == i) {
 						builtParamsArray[i][j] = param;
 					}
 				}

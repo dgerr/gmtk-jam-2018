@@ -179,7 +179,7 @@ class Tile extends FlxSpriteGroup {
 	public function addWorldObject(worldObject:WorldObject) {
 		worldObjects.push(worldObject);
 		worldObjectsLayer.add(worldObject);
-		worldObject.x = REAL_TILE_WIDTH * x;
-		worldObject.y = REAL_TILE_HEIGHT * y;
+		worldObject.x = REAL_TILE_WIDTH * worldObject.localX;
+		worldObject.y = REAL_TILE_HEIGHT * worldObject.localY;
 	}
 }
