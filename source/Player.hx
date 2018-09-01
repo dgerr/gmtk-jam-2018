@@ -1,17 +1,16 @@
 package;
 
 import flixel.FlxSprite;
-import flixel.group.FlxSpriteGroup;
 import openfl.Assets;
 import openfl.display.BitmapData;
 import openfl.geom.Matrix;
 
-class Player extends FlxSpriteGroup {
+class Player extends WorldObject {
 	public var spriteData:BitmapData;
 	public var _sprite:FlxSprite;
 	
 	public function new():Void {
-		super();
+		super(null, null, null);
 		
 		var rawSpriteData = Assets.getBitmapData("assets/images/cat_8.png");
 		

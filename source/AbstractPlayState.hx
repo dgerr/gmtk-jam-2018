@@ -17,12 +17,13 @@ enum State {
 	Free;
 	PlayerMoving;
 	EnemyMoving;
-	Resolving;
+	StartResolving;
+	EndResolving;
 	ShiftingTile;
 	CastingCane;
 	Locked;
 }
-class PlayState extends FlxTransitionableState {
+class AbstractPlayState extends FlxTransitionableState {
 	
 	public var backgroundLayer:FlxSpriteGroup;
 	public var entityLayer:FlxSpriteGroup;
@@ -39,38 +40,32 @@ class PlayState extends FlxTransitionableState {
 	
 	public var tileCoords:Object;
 	public var localTileCoords:Object;
+	public var respawnTileCoords:Object;
 	
 	public var currentTile:Tile;
 	public var nextTile:Tile;
 	public var frameNumber:Int = 0;
 	
-	public var animatingObject:WorldObject = null;
+	public var animatingObjects:Array<WorldObject>;
+	public var animatingDirections:Array<Object>;
 	
-	override public function create():Void {
+	public override function create():Void {
 		super.create();
 		
 		backgroundLayer = new FlxSpriteGroup();
 		entityLayer = new FlxSpriteGroup();
 		particleLayer = new FlxSpriteGroup();
 		
-		TiledMapManager.get().loadTileSet("world");
-		
-		tileCoords = {x: GameState.get().overworldPosition.tx, y: GameState.get().overworldPosition.ty};
-		localTileCoords = {x: GameState.get().overworldPosition.x, y: GameState.get().overworldPosition.y};
-		
-		currentTile = new Tile(TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
-		
 		add(backgroundLayer);
 		add(entityLayer);
 		add(particleLayer);
 		
+		animatingObjects = new Array<WorldObject>();
+		animatingDirections = new Array<Object>();
+		
 		p = new Player();
 		
 		entityLayer.add(p);
-		
-		backgroundLayer.add(currentTile);
-		
-		snapPlayerToTile();
 		
 		FlxTransitionableState.defaultTransIn = new TransitionData();
 		FlxTransitionableState.defaultTransOut = new TransitionData();
@@ -89,8 +84,8 @@ class PlayState extends FlxTransitionableState {
 	}
 	
 	private function snapPlayerToTile() {
-		p.x = Tile.TILE_WIDTH * Tile.TILE_SCALE * localTileCoords.x;
-		p.y = Tile.TILE_HEIGHT * Tile.TILE_SCALE * localTileCoords.y;
+		p.x = Tile.REAL_TILE_WIDTH * localTileCoords.x;
+		p.y = Tile.REAL_TILE_HEIGHT * localTileCoords.y;
 	}
 	
 	private function startPlayerMove() {
@@ -100,7 +95,7 @@ class PlayState extends FlxTransitionableState {
 		if (localTileCoords.x >= 0 && localTileCoords.y >= 0 &&
 		    localTileCoords.x < 10 && localTileCoords.y < 10) {
 			var tileObject = currentTile.getSquare(localTileCoords);
-			if (TiledMapManager.get().isSolid(tileObject.bg) || TiledMapManager.get().isSolid(tileObject.fg)) {
+			if (!currentTile.isPathable(localTileCoords)) {
 				// collision with solid object
 				state = State.Free;
 				localTileCoords.x -= direction.x;
@@ -108,13 +103,16 @@ class PlayState extends FlxTransitionableState {
 				return;
 			}
 			if (tileObject.object != null) {
-				if (!currentTile.isPathable({x: localTileCoords.x + direction.x, y: localTileCoords.y + direction.y})) {
-					state = State.Free;
-					localTileCoords.x -= direction.x;
-					localTileCoords.y -= direction.y;
-					return;
-				} else {
-					animatingObject = tileObject.object;
+				if (WorldObject.isPushable(tileObject.object)) {
+					if (!currentTile.isPathable({x: localTileCoords.x + direction.x, y: localTileCoords.y + direction.y})) {
+						state = State.Free;
+						localTileCoords.x -= direction.x;
+						localTileCoords.y -= direction.y;
+						return;
+					} else {
+						animatingObjects.push(tileObject.object);
+						animatingDirections.push(Utilities.cloneDirection(direction));
+					}
 				}
 			}
 			if (direction.x == -1) {
@@ -126,6 +124,8 @@ class PlayState extends FlxTransitionableState {
 			} else {
 				p._sprite.animation.play("u");
 			}
+			animatingObjects.push(p);
+			animatingDirections.push(Utilities.cloneDirection(direction));
 			state = State.PlayerMoving;
 			frameNumber += 1;
 			animFrames = FRAMES_BETWEEN_TILE_MOVE;
@@ -177,27 +177,30 @@ class PlayState extends FlxTransitionableState {
 			--animFrames;
 			var amtToMove = Std.int(Tile.TILE_WIDTH * Tile.TILE_SCALE / FRAMES_BETWEEN_TILE_MOVE);
 			
-			p.x += direction.x * amtToMove;
-			p.y += direction.y * amtToMove;
-			if (animatingObject != null) {
-				animatingObject.x += direction.x * amtToMove;
-				animatingObject.y += direction.y * amtToMove;
+			for (i in 0...animatingObjects.length) {
+				animatingObjects[i].x += animatingDirections[i].x * amtToMove;
+				animatingObjects[i].y += animatingDirections[i].y * amtToMove;
 			}
 			if (animFrames == 0) {
-				if (animatingObject != null) {
-					animatingObject.localX += direction.x;
-					animatingObject.localY += direction.y;
-					animatingObject = null;
+				for (i in 0...animatingObjects.length) {
+					animatingObjects[i].localX += animatingDirections[i].x;
+					animatingObjects[i].localY += animatingDirections[i].y;
 				}
-				state = State.Resolving;
+				if (currentTile.getObjectAtLoc(localTileCoords) != null && currentTile.getObjectAtLoc(localTileCoords).type == "fireball") {
+					currentTile.removeObjectsAtLoc(localTileCoords);
+					killPlayer();
+				}
+				animatingObjects.splice(0, animatingObjects.length);
+				animatingDirections.splice(0, animatingDirections.length);
+				state = State.StartResolving;
 				snapPlayerToTile();
-				resolveMove();
+				startResolveMove();
 			}
 		}
 	}
 	
-	public function resolveMove() {
-		if (state != State.Resolving) {
+	public function startResolveMove() {
+		if (state != State.StartResolving) {
 			return;
 		}
 
@@ -210,23 +213,28 @@ class PlayState extends FlxTransitionableState {
 			}
 		}
 		
-		if (state == State.Resolving) {
-			for (worldObject in currentTile.worldObjects) {
+		if (state == State.StartResolving) {
+			var i = currentTile.worldObjects.length - 1;
+			while (i > 0) {
+				var worldObject = currentTile.worldObjects[i];
 				if (worldObject.type == "fireball") {
-					if (worldObject.params.get("direction") == "east") {
-						worldObject.x += Tile.REAL_TILE_WIDTH;
-						worldObject.localX += 1;
-					} else if (worldObject.params.get("direction") == "south") {
-						worldObject.y += Tile.REAL_TILE_HEIGHT;
-						worldObject.localY += 1;
-					}else if (worldObject.params.get("direction") == "west") {
-						worldObject.x -= Tile.REAL_TILE_HEIGHT;
-						worldObject.localX -= 1;
-					}else if (worldObject.params.get("direction") == "north") {
-						worldObject.y -= Tile.REAL_TILE_HEIGHT;
-						worldObject.localY -= 1;
+					var dir = Utilities.directionToObject(worldObject.params.get("direction"));
+					worldObject.x += Tile.REAL_TILE_WIDTH * dir.x;
+					worldObject.y += Tile.REAL_TILE_HEIGHT * dir.y;
+					
+					if (localTileCoords.x == worldObject.localX + dir.x && localTileCoords.y == worldObject.localY + dir.y) {
+						killPlayer();
+						currentTile.worldObjectsLayer.remove(worldObject);
+						currentTile.worldObjects.splice(i, 1);
+					} else if (!currentTile.isPathableFGOnly({x: worldObject.localX + dir.x, y: worldObject.localY + dir.y})) {
+						currentTile.worldObjectsLayer.remove(worldObject);
+						currentTile.worldObjects.splice(i, 1);
+					} else {
+						worldObject.localX += dir.x;
+						worldObject.localY += dir.y;
 					}
 				}
+				--i;
 			}
 			
 			for (worldObject in currentTile.worldObjects) {
@@ -260,12 +268,15 @@ class PlayState extends FlxTransitionableState {
 												 ["x" => Std.string(nx),
 												  "y" => Std.string(ny)]);
 			currentTile.addWorldObject(wo);
+			trace(wo.x + "," + wo.y);
 			
 			for (i in 0...4) {
 				var p:Particle = new Particle("particles/smoke.png", wo.x - 10 + 20 * (i % 2), wo.y - 10 + 20 * Std.int(i / 2), 0.5,
 											  function(v) { v.y -= 0.5; v.alpha -= 0.1; });
 				particleLayer.add(p);
 			}
+			state = State.StartResolving;
+			startResolveMove();
 		}
 		
 		state = State.Free;
@@ -321,15 +332,21 @@ class PlayState extends FlxTransitionableState {
 			state = State.Free;
 			localTileCoords.x -= 10 * direction.x;
 			localTileCoords.y -= 10 * direction.y;
+			respawnTileCoords = Utilities.cloneDirection(localTileCoords);
 			snapPlayerToTile();
 		}
+	}
+	
+	public function killPlayer() {
+		localTileCoords = Utilities.cloneDirection(respawnTileCoords);
+		snapPlayerToTile();
 	}
 
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
 		
 		handleMovement();
-		resolveMove();
+		startResolveMove();
 		resolveCast();
 		shiftTile();
 	}

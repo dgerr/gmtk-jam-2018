@@ -23,6 +23,9 @@ class Tile extends FlxSpriteGroup {
 	public var bgDisplayData:BitmapData;
 	public var fgDisplayData:BitmapData;
 	
+	public var widthInTiles:Int;
+	public var heightInTiles:Int;
+	
 	public var tileCount:Map<Int, Int>;
 	
 	public var worldObjects:Array<WorldObject>;
@@ -30,6 +33,9 @@ class Tile extends FlxSpriteGroup {
 	
 	public function new(tileObject:Object):Void {
 		super();
+		
+		widthInTiles = 10;
+		heightInTiles = 10;
 		
 		this.tileObject = tileObject;
 		worldObjects = new Array<WorldObject>();
@@ -60,7 +66,21 @@ class Tile extends FlxSpriteGroup {
 					tileData.copyPixels(srcBitmapData, TiledMapManager.getRectangleOfValue(fg[i][j]),
 									    new Point(0, 0), null, null, true);
 					var scaledTileData:BitmapData = new BitmapData(REAL_TILE_WIDTH, REAL_TILE_HEIGHT, true, 0);
-					scaledTileData.draw(tileData, mx);
+					var mx2 = new Matrix();
+					mx2.translate( -TILE_WIDTH / 2, -TILE_HEIGHT / 2);
+					if (tileObject.params[i][j].exists("direction")) {
+						var dir = tileObject.params[i][j].get("direction");
+						if (dir == "north") {
+							mx2.rotate(3 * Math.PI / 2);
+						} else if (dir == "west") {
+							mx2.rotate(Math.PI);
+						} else if (dir == "south") {
+							mx2.rotate(Math.PI / 2);
+						}
+					}
+					mx2.translate(TILE_WIDTH / 2, TILE_HEIGHT / 2);
+					mx2.scale(TILE_SCALE, TILE_SCALE);
+					scaledTileData.draw(tileData, mx2);
 					var worldObject:WorldObject = new WorldObject(scaledTileData, WorldConstants.specialTileTypes[fg[i][j]], tileObject.params[i][j]);
 					addWorldObject(worldObject);
 					fg[i][j] = -1;
@@ -161,6 +181,35 @@ class Tile extends FlxSpriteGroup {
 		}
 	}
 	
+	public function getObjectAtLoc(loc:Object):WorldObject {
+		for (worldObject in worldObjects) {
+			if (worldObject.localX == loc.x && worldObject.localY == loc.y) {
+				return worldObject;
+			}
+		}
+		return null;
+	}
+	
+	public function removeObjectsAtLoc(loc:Object) {
+		for (worldObject in worldObjects) {
+			if (worldObject.localX == loc.x && worldObject.localY == loc.y) {
+				worldObjectsLayer.remove(worldObject);
+				worldObjects.remove(worldObject);
+			}
+		}
+	}
+	
+	public function removeObjectsOfType(type:String) {
+		var i:Int = worldObjects.length - 1;
+		while (i >= 0) {
+			if (worldObjects[i].type == type) {
+				worldObjectsLayer.remove(worldObjects[i]);
+				worldObjects.splice(i, 1);
+			}
+			--i;
+		}
+	}
+	
 	public function getNumTiles(value:Int) {
 		if (!tileCount.exists(value)) {
 			return 0;
@@ -168,9 +217,28 @@ class Tile extends FlxSpriteGroup {
 		return tileCount[value];
 	}
 	
-	public function isPathable(loc:Object):Bool {
+	public function isInBounds(loc:Object) {
+		return loc.x >= 0 && loc.y >= 0 && loc.x < widthInTiles && loc.y < heightInTiles;
+	}
+	
+	public function isPathableFGOnly(loc:Object):Bool {
+		if (!isInBounds(loc)) {
+			return false;
+		}
 		var squareObj = getSquare(loc);
-		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg) || squareObj.object != null) {
+		if (TiledMapManager.get().isSolid(squareObj.fg) || (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
+			return false;
+		}
+		return true;
+	}
+
+	public function isPathable(loc:Object):Bool {
+		if (!isInBounds(loc)) {
+			return false;
+		}
+		var squareObj = getSquare(loc);
+		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg) ||
+		    (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
 			return false;
 		}
 		return true;
