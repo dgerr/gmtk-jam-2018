@@ -163,6 +163,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		backgroundLayer.add(nextTile);
 		nextTile.x = Main.GAME_WIDTH * direction.x;
 		nextTile.y = Main.GAME_HEIGHT * direction.y;
+		nextTile.changeAllSquares(292, 23);
 	}
 	
 	public function handleMovement():Void {
@@ -374,6 +375,10 @@ class AbstractPlayState extends FlxTransitionableState {
 			state = State.Free;
 			localTileCoords.x -= 10 * direction.x;
 			localTileCoords.y -= 10 * direction.y;
+			trace(currentTile.getSquare(localTileCoords));
+			if (currentTile.getSquare(localTileCoords).fg != 23) {
+				currentTile.changeAllSquares(23, 292);
+			}
 			respawnTileCoords = Utilities.cloneDirection(localTileCoords);
 			snapPlayerToTile();
 		}

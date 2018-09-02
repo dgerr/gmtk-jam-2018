@@ -33,8 +33,10 @@ class ShrinePlayState extends AbstractPlayState {
 		// check red squares
 		if (tileInfo.bg == 289) {
 			currentTile.setSquare(localTileCoords, 290);
+		} else if (tileInfo.bg == 290) {
+			currentTile.setSquare(localTileCoords, 314);
 		}
-		if (currentTile.getNumTiles(289) > 0) {
+		if (currentTile.getNumTiles(289) > 0 || currentTile.getNumTiles(314) > 0) {
 			passedChecks = false;
 		}
 		
@@ -79,24 +81,21 @@ class ShrinePlayState extends AbstractPlayState {
 		super.killPlayer();
 		
 		currentTile.changeAllSquares(290, 289);
+		currentTile.changeAllSquares(314, 289);
 	}
 
 	private override function startShift() {
 		tileCoords.x += direction.x;
 		tileCoords.y += direction.y;
 		
-		if (TiledMapManager.get().hasTileObjectAt(tileCoords.x, tileCoords.y)) {
-			state = State.ShiftingTile;
-			animFrames = FRAMES_BETWEEN_TILE_SWITCH;
-				
-			nextTile = new Tile(TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
-			backgroundLayer.add(nextTile);
-			nextTile.x = Main.GAME_WIDTH * direction.x;
-			nextTile.y = Main.GAME_HEIGHT * direction.y;
-		} else {
+		if (!TiledMapManager.get().hasTileObjectAt(tileCoords.x, tileCoords.y)) {
 			state = State.Locked;
 			FlxG.switchState(new OverworldPlayState());
+			return;
 		}
+		tileCoords.x -= direction.x;
+		tileCoords.y -= direction.y;
+		super.startShift();
 	}
 
 	public function new(shrineID:String) {
