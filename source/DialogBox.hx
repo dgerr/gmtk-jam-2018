@@ -11,7 +11,7 @@ import openfl.display.BitmapData;
 class DialogBox extends FlxSpriteGroup {
 	public static inline var TEXT_PADDING_X:Int = 25;
 	public static inline var TEXT_PADDING_Y:Int = 20;
-	public static inline var OPTIONS_Y:Int = Main.GAME_HEIGHT - 60;
+	public static inline var OPTIONS_Y:Int = 72;
 	
 	public var bgSprite:FlxSprite;
 	public var text:FlxText;
@@ -37,14 +37,14 @@ class DialogBox extends FlxSpriteGroup {
 		
 		options = new FlxSprite();
 		options.loadGraphic(Utilities.scaleBitmapData(Assets.getBitmapData("assets/images/dialogbox_options.png"), 3, 3), true, 30, 30);
-		options.animation.add("next", [0], 0);
-		options.animation.add("finish", [1], 0);
-		options.animation.play("next");
-		options.x = Main.GAME_WIDTH - 50;
-		options.y = OPTIONS_Y;
+		options.animation.add("next", [0], 1);
+		options.animation.add("finish", [1], 1);
+		options.animation.play((messages.length > 1 ? "next" : "finish"));
+		options.x = Main.GAME_WIDTH - 52;
+		options.y = this.y + OPTIONS_Y;
 		
 		this.add(bgSprite);
-		this.add(options);
+		add(options);
 		
 		this.y = Main.GAME_HEIGHT - (bitmapData.height * Tile.TILE_SCALE);
 		
@@ -67,7 +67,7 @@ class DialogBox extends FlxSpriteGroup {
 				
 				if (index == messages.length - 1) {
 					options.animation.play("finish");
-					options.y = OPTIONS_Y;
+					options.y = this.y + OPTIONS_Y;
 				}
 			} else {
 				if (callback != null) {
@@ -91,7 +91,7 @@ class DialogBox extends FlxSpriteGroup {
 		
 		if (index < messages.length - 1 && frameCount % 36 == 0) {
 			bounce = !bounce;
-			options.y = OPTIONS_Y + (bounce ? -10 : 0);
+			options.y = this.y + (bounce ? OPTIONS_Y - 10 : OPTIONS_Y);
 		}
 	}
 }

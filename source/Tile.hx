@@ -277,4 +277,11 @@ class Tile extends FlxSpriteGroup {
 		worldObject.x = REAL_TILE_WIDTH * worldObject.loc.x;
 		worldObject.y = REAL_TILE_HEIGHT * worldObject.loc.y;
 	}
+	
+	public override function destroy() {
+		for (worldObject in worldObjects) {
+			worldObject.destroy();
+		}
+		super.destroy();
+	}
 }

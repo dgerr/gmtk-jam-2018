@@ -167,14 +167,14 @@ class AbstractPlayState extends FlxTransitionableState {
 			}
 		}
 		
-		var sortedZombies = new Array<ZombieCat>();
+		var sortedZombies = new Array<WorldObject>();
 		for (obj in currentTile.worldObjects) {
 			if (obj.type == "zombie") {
 				sortedZombies.push(obj);
 			}
 		}
 		
-		for (zombie in sortedZombies) {
+		/*for (zombie in sortedZombies) {
 			var dx = p.loc.x - zombie.loc.x;
 			var dy = p.loc.y - zombie.loc.y;
 			
@@ -184,10 +184,12 @@ class AbstractPlayState extends FlxTransitionableState {
 			var tryX = {x: zombie.loc.x + sdx, y: zombie.loc.y};
 			var tryY = {x: zombie.loc.x, y: zombie.loc.y + sdy};
 			
-			if (Math.abs(dx) > Math.abs(dy)) {
-				
+			var pathableX = isPathable(tryX);
+			var pathableY = isPathable(tryY);
+			
+			if (Math.abs(dx) > Math.abs(dy) && pathableX) {
 			}
-		}
+		}*/
 		
 		if (state == State.Free) {
 			var nextLoc = {x: p.loc.x + playerDirection.x, y: p.loc.y + playerDirection.y};
@@ -226,15 +228,15 @@ class AbstractPlayState extends FlxTransitionableState {
 				playerDirection = {x: 0, y: -1};
 				startPlayerMove();
 			}
-			if (!_up && _down) {
+			if (state == State.Free && !_up && _down) {
 				playerDirection = {x: 0, y: 1};
 				startPlayerMove();
 			}
-			if (_left && !_right) {
+			if (state == State.Free && _left && !_right) {
 				playerDirection = {x: -1, y: 0};
 				startPlayerMove();
 			}
-			if (!_left && _right) {
+			if (state == State.Free && !_left && _right) {
 				playerDirection = {x: 1, y: 0};
 				startPlayerMove();
 			}
@@ -275,46 +277,44 @@ class AbstractPlayState extends FlxTransitionableState {
 			return;
 		}
 		
-		if (state == State.StartResolving) {
-			var i = currentTile.worldObjects.length - 1;
-			while (i > 0) {
-				var worldObject = currentTile.worldObjects[i];
-				if (worldObject.type == "fireball") {
-					var dir = Utilities.directionToObject(worldObject.params.get("direction"));
-					worldObject.x += Tile.REAL_TILE_WIDTH * dir.x;
-					worldObject.y += Tile.REAL_TILE_HEIGHT * dir.y;
-					
-					if (p.loc.x == worldObject.loc.x + dir.x && p.loc.y == worldObject.loc.y + dir.y) {
-						killPlayer();
-						currentTile.worldObjectsLayer.remove(worldObject);
-						currentTile.worldObjects.splice(i, 1);
-					} else if (!currentTile.isPathableFGOnly({x: worldObject.loc.x + dir.x, y: worldObject.loc.y + dir.y})) {
-						currentTile.worldObjectsLayer.remove(worldObject);
-						currentTile.worldObjects.splice(i, 1);
-					} else {
-						worldObject.loc.x += dir.x;
-						worldObject.loc.y += dir.y;
-					}
-				}
-				--i;
-			}
-			
-			for (worldObject in currentTile.worldObjects) {
-				if (worldObject.type == "cannon") {
-					if ((moveCount + Std.parseInt(worldObject.params.get("offset"))) % Std.parseInt(worldObject.params.get("frequency")) == 0) {
-						var dirString = worldObject.params.get("direction");
-						var dir = Utilities.directionToObject(dirString);
-						var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297, dirString), "fireball",
-															 ["x" => Std.string(worldObject.loc.x + dir.x),
-															  "y" => Std.string(worldObject.loc.y + dir.y),
-															  "direction" => dirString]);
-						currentTile.addWorldObject(wo);
-					}
+		var i = currentTile.worldObjects.length - 1;
+		while (i > 0) {
+			var worldObject = currentTile.worldObjects[i];
+			if (worldObject.type == "fireball") {
+				var dir = Utilities.directionToObject(worldObject.params.get("direction"));
+				worldObject.x += Tile.REAL_TILE_WIDTH * dir.x;
+				worldObject.y += Tile.REAL_TILE_HEIGHT * dir.y;
+				
+				if (p.loc.x == worldObject.loc.x + dir.x && p.loc.y == worldObject.loc.y + dir.y) {
+					killPlayer();
+					currentTile.worldObjectsLayer.remove(worldObject);
+					currentTile.worldObjects.splice(i, 1);
+				} else if (!currentTile.isPathableFGOnly({x: worldObject.loc.x + dir.x, y: worldObject.loc.y + dir.y})) {
+					currentTile.worldObjectsLayer.remove(worldObject);
+					currentTile.worldObjects.splice(i, 1);
+				} else {
+					worldObject.loc.x += dir.x;
+					worldObject.loc.y += dir.y;
 				}
 			}
-			
-			state = State.Free;
+			--i;
 		}
+		
+		for (worldObject in currentTile.worldObjects) {
+			if (worldObject.type == "cannon") {
+				if ((moveCount + Std.parseInt(worldObject.params.get("offset"))) % Std.parseInt(worldObject.params.get("frequency")) == 0) {
+					var dirString = worldObject.params.get("direction");
+					var dir = Utilities.directionToObject(dirString);
+					var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297, dirString), "fireball",
+														 ["x" => Std.string(worldObject.loc.x + dir.x),
+														  "y" => Std.string(worldObject.loc.y + dir.y),
+														  "direction" => dirString]);
+					currentTile.addWorldObject(wo);
+				}
+			}
+		}
+		
+		state = State.Free;
 	}
 	
 	public function castCane() {
