@@ -1,9 +1,11 @@
 package;
 
 import flixel.FlxG;
+import flixel.FlxSprite;
 import flixel.graphics.FlxGraphic;
 import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
+import openfl.Assets;
 import openfl.utils.Object;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.transition.FlxTransitionSprite.GraphicTransTileDiamond;
@@ -54,6 +56,9 @@ class AbstractPlayState extends FlxTransitionableState {
 	public var animatingObjects:Array<WorldObject>;
 	public var animatingDirections:Array<Object>;
 	
+	public var keyIndicator:FlxSprite;
+	public var keyIndicatorAttached:Bool = false;
+	
 	public override function create():Void {
 		super.create();
 		
@@ -76,6 +81,12 @@ class AbstractPlayState extends FlxTransitionableState {
 		
 		entityLayer.add(p);
 		facing = {x: 0, y: 1};
+		
+		keyIndicator = new FlxSprite();
+		keyIndicator.loadGraphic(Utilities.scaleBitmapData(Assets.getBitmapData("assets/images/key_indicators.png"), 3, 3), true, 30, 30);
+		keyIndicator.animation.add("z", [0], 1, true);
+		keyIndicator.animation.add("r", [1], 1, true);
+		keyIndicator.animation.play("z");
 		
 		FlxTransitionableState.defaultTransIn = new TransitionData();
 		FlxTransitionableState.defaultTransOut = new TransitionData();
@@ -217,12 +228,18 @@ class AbstractPlayState extends FlxTransitionableState {
 				playerDirection = {x: 1, y: 0};
 				startPlayerMove();
 			}
+			if (FlxG.keys.anyJustPressed([R]) && state == State.Free) {
+				killPlayer();
+			}
 			if (FlxG.keys.anyJustPressed([Z]) && state == State.Free) {
 				searchForDialog();
 			}
 			if (FlxG.keys.anyJustPressed([X]) && state == State.Free) {
 				state = State.CastingCane;
 			}
+		}
+		if (state == State.Free) {
+			refreshKeyIndicator();
 		}
 		if (state == State.PlayerMoving) {
 			--animFrames;
@@ -256,17 +273,35 @@ class AbstractPlayState extends FlxTransitionableState {
 				animatingObjects[i].y += animatingDirections[i].y * amtToMove;
 			}
 			if (animFrames == 0) {
-				for (i in 0...animatingObjects.length) {
-					if (animatingObjects[i].type == "zombie" && Math.abs(p.loc.x - animatingObjects[i].loc.x) + Math.abs(p.loc.y - animatingObjects[i].loc.y) <= 1) {
+				var i = 0;
+				while (i < animatingObjects.length) {
+					var wo:WorldObject = animatingObjects[i];
+					if (wo.type == "zombie" && (Math.abs(p.loc.x - wo.loc.x) + Math.abs(p.loc.y - wo.loc.y)) <= 1) {
 						var p:Particle = new Particle("particles/heart.png", animatingObjects[i].x + Tile.REAL_TILE_WIDTH / 2 - 20, animatingObjects[i].y - 15, 1,
 													  function(p) { p.y -= (0.6 - 0.024 * p.frameNumber); p.alpha -= 0.02; });
 						particleLayer.add(p);
+					} else if (wo.type == "fireball") {
+						if (p.loc.x == wo.loc.x && p.loc.y == wo.loc.y) {
+							killPlayer();
+							currentTile.worldObjectsLayer.remove(wo);
+							currentTile.worldObjects.remove(wo);
+							animatingObjects.splice(i, 1);
+							animatingDirections.splice(i, 1);
+							--i;
+						} else if (!currentTile.isPathableFGOnly(wo.loc)) {
+							currentTile.worldObjectsLayer.remove(wo);
+							currentTile.worldObjects.remove(wo);
+							animatingObjects.splice(i, 1);
+							animatingDirections.splice(i, 1);
+							--i;
+						}
 					}
 					currentTile.removeObjectsAtLocOtherThan(animatingObjects[i]);
+					++i;
 				}
 				animatingObjects.splice(0, animatingObjects.length);
 				animatingDirections.splice(0, animatingDirections.length);
-				state = State.Free;
+				givePlayerControl();
 			}
 		}
 	}
@@ -275,6 +310,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (state != State.StartResolving) {
 			return;
 		}
+		++moveCount;
 		
 		var sortedZombies = new Array<WorldObject>();
 		for (obj in currentTile.worldObjects) {
@@ -333,18 +369,16 @@ class AbstractPlayState extends FlxTransitionableState {
 		while (i > 0) {
 			var worldObject = currentTile.worldObjects[i];
 			if (worldObject.type == "fireball") {
-				var dir = Utilities.directionToObject(worldObject.params.get("direction"));
-				worldObject.x += Tile.REAL_TILE_WIDTH * dir.x;
-				worldObject.y += Tile.REAL_TILE_HEIGHT * dir.y;
-				
-				if (p.loc.x == worldObject.loc.x + dir.x && p.loc.y == worldObject.loc.y + dir.y) {
+				state = State.EnemyMoving;
+				animFrames = FRAMES_BETWEEN_TILE_MOVE;
+				if (p.loc.x == worldObject.loc.x && p.loc.y == worldObject.loc.y) {
 					killPlayer();
 					currentTile.worldObjectsLayer.remove(worldObject);
 					currentTile.worldObjects.splice(i, 1);
-				} else if (!currentTile.isPathableFGOnly({x: worldObject.loc.x + dir.x, y: worldObject.loc.y + dir.y})) {
-					currentTile.worldObjectsLayer.remove(worldObject);
-					currentTile.worldObjects.splice(i, 1);
 				} else {
+					animatingObjects.push(worldObject);
+					var dir = Utilities.directionToObject(worldObject.params.get("direction"));
+					animatingDirections.push(dir);
 					worldObject.loc.x += dir.x;
 					worldObject.loc.y += dir.y;
 				}
@@ -367,7 +401,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		}
 		
 		if (state != State.EnemyMoving) {
-			state = State.Free;
+			givePlayerControl();
 		}
 	}
 	
@@ -397,8 +431,6 @@ class AbstractPlayState extends FlxTransitionableState {
 			state = State.StartResolving;
 			startResolveMove();
 		}
-		
-		state = State.Free;
 	}
 	
 	public function resolveCast() {
@@ -456,7 +488,7 @@ class AbstractPlayState extends FlxTransitionableState {
 				particle.destroy();
 			}
 			nextTile = null;
-			state = State.Free;
+			givePlayerControl();
 			p.loc.x -= 9 * playerDirection.x;
 			p.loc.y -= 9 * playerDirection.y;
 			if (currentTile.getSquare(p.loc).fg != 23) {
@@ -465,6 +497,28 @@ class AbstractPlayState extends FlxTransitionableState {
 			respawnTileCoords = Utilities.cloneDirection(p.loc);
 			snapPlayerToTile();
 		}
+	}
+	public function refreshKeyIndicator() {
+		var potentialPartner = currentTile.getObjectAtLoc({x: p.loc.x + facing.x, y: p.loc.y + facing.y});
+		if (potentialPartner != null && potentialPartner.type == "cat") {
+			if (!keyIndicatorAttached) {
+				interfaceLayer.add(keyIndicator);
+			}
+			keyIndicator.x = potentialPartner.x + Tile.REAL_TILE_WIDTH / 2 - 15;
+			keyIndicator.y = potentialPartner.y - 25;
+			keyIndicatorAttached = true;
+		} else {
+			if (keyIndicatorAttached) {
+				interfaceLayer.remove(keyIndicator);
+			}
+			keyIndicatorAttached = false;
+		}
+	}
+	
+	public function givePlayerControl() {
+		state = State.Free;
+		
+		refreshKeyIndicator();
 	}
 	
 	public function spawnParticleEffects() {
@@ -486,6 +540,14 @@ class AbstractPlayState extends FlxTransitionableState {
 	}
 	
 	public function killPlayer() {
+		for (object in currentTile.worldObjects) {
+			if (object.type == "zombie") {
+				object.loc.x = Std.parseInt(object.params["ox"]);
+				object.loc.y = Std.parseInt(object.params["oy"]);
+				object.x = Tile.REAL_TILE_WIDTH * object.loc.x;
+				object.y = Tile.REAL_TILE_HEIGHT * object.loc.y;
+			}
+		}
 		p.loc = Utilities.cloneDirection(respawnTileCoords);
 		snapPlayerToTile();
 	}
