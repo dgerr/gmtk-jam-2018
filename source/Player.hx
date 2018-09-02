@@ -25,7 +25,8 @@ class Player extends WorldObject {
 		_sprite.animation.add("r", [2, 11], 3, false);
 		_sprite.animation.add("u", [1, 10], 3, false);
 		_sprite.animation.add("d", [0, 9], 3, false);
-		_sprite.animation.add("stand", [0], 1, true);
+		_sprite.animation.add("aloft", [4, 13], 1, true);
+		_sprite.animation.add("stand", [0], 4, true);
 		
 		add(_sprite);
 	}

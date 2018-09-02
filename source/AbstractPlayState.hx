@@ -573,7 +573,7 @@ class AbstractPlayState extends FlxTransitionableState {
 	
 	public function getSpecialDialog(type:String):Array<String> {
 		if (type == "elder") {
-			if (!GameState.get().unlockedStaff && GameState.get().shrinesBeaten >= 3) {
+			if (!GameState.get().unlockedStaff && GameState.get().shrinesBeaten >= 2) {
 				GameState.get().unlockedStaff = true;
 				return ["You're making excellent progress. Let me teach you an ancient magic spell...",
 				        "(You can use the [Kitten Box] ability! Press 'X' followed by a direction to summon a pushable crate!)",
@@ -592,7 +592,7 @@ class AbstractPlayState extends FlxTransitionableState {
 				return ["What are you looking at, punk?", "...", "... Sorry! Sorry! I just wanted to sound cool.",
 				        "But seriously, this place is off limits. Come back when you can cast a magic spell."];
 			} else {
-				return ["Think you're hot stuff now? Just 'cause the Elder taught you a new move?", "Well, you are! I believe in you <3"];
+				return ["Think you're hot stuff now? Just 'cause the Elder taught you a new move?", "Well, you are! I believe in you! ^^"];
 			}
 		}
 		trace("Unknown type " + type);

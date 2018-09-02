@@ -1,6 +1,7 @@
 package;
 
 import flixel.FlxG;
+import flixel.util.FlxTimer;
 
 using AbstractPlayState.State;
 
@@ -96,9 +97,11 @@ class ShrinePlayState extends AbstractPlayState {
 				GameState.get().shrinesBeaten += 1;
 			}
 			state = State.Locked;
+			currentTile.changeAllSquares(312, -1);
+			p._sprite.animation.play("aloft");
 			SoundManager.get().stopMusic();
 			SoundManager.get().playSound("victory");
-			FlxG.switchState(new OverworldPlayState());
+			new FlxTimer().start(5, function(t:FlxTimer) { FlxG.switchState(new OverworldPlayState()); }, 1);
 		}
 
 		if (state == State.StartResolving) {
