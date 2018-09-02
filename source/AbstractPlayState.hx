@@ -136,7 +136,7 @@ class AbstractPlayState extends FlxTransitionableState {
 						animatingObjects.push(tileObject.object);
 						animatingDirections.push(Utilities.cloneDirection(direction));
 					}
-				} else {
+				} else if (WorldObject.isSolid(tileObject.object)) {
 					// collision with unpushable WorldObject
 					state = State.Free;
 					localTileCoords.x -= direction.x;

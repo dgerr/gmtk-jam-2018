@@ -74,6 +74,12 @@ class ShrinePlayState extends AbstractPlayState {
 			state = State.Free;
 		}
 	}
+	
+	public override function killPlayer() {
+		super.killPlayer();
+		
+		currentTile.changeAllSquares(290, 289);
+	}
 
 	private override function startShift() {
 		tileCoords.x += direction.x;
