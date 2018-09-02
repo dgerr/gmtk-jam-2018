@@ -414,15 +414,15 @@ class AbstractPlayState extends FlxTransitionableState {
 		}
 		if (potentialPartner.type == "cat") {
 			if (potentialPartner.params["type"] == "normal") {
-				showDialogBox(potentialPartner.params["text"]);
+				showDialogBox(potentialPartner.params["text"].split("|"));
 			}
 		}
 	}
 	
-	public function showDialogBox(text:String) {
+	public function showDialogBox(text:Array<String>) {
 		showingDialogBox = true;
-		dialogBox = new DialogBox(text, function() { showingDialogBox = false; dialogBox.destroy(); },
-		                          function() { showingDialogBox = false; dialogBox.destroy(); handleMovement(); });
+		dialogBox = new DialogBox(text, function() { showingDialogBox = false; },
+		                          function() { showingDialogBox = false; handleMovement(); });
 		
 		interfaceLayer.add(dialogBox);
 	}
