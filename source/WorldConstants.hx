@@ -10,7 +10,7 @@ class WorldConstants {
 		  {tx: 2, ty: 5, x: 6, y: 4, id: "shrine4"},
 		  {tx: 1, ty: 2, x: 4, y: 5, id: "shrine5"},
 		  {tx: 5, ty: 0, x: 7, y: 2, id: "shrine6"},
-		  {tx: 1, ty: 0, x: 1, y: 5, id: "shrine7"},
+		  {tx: 1, ty: 0, x: 2, y: 5, id: "shrine7"},
 		  {tx: 5, ty: 5, x: 4, y: 5, id: "shrine8"}
 		];
 		  
@@ -73,5 +73,5 @@ class WorldConstants {
 	
 	public static var shrinesWithPermanentGates:Array<String> = ["shrine5"];
 	
-	public static var START_LOCATION:Object = {tx: 3, ty: 1, x: 4, y: 4};
+	public static var START_LOCATION:Object = {tx: 3, ty: 3, x: 4, y: 4};
 }

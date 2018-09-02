@@ -96,6 +96,8 @@ class ShrinePlayState extends AbstractPlayState {
 				GameState.get().shrinesBeaten += 1;
 			}
 			state = State.Locked;
+			SoundManager.get().stopMusic();
+			SoundManager.get().playSound("victory");
 			FlxG.switchState(new OverworldPlayState());
 		}
 

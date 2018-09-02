@@ -564,9 +564,9 @@ class AbstractPlayState extends FlxTransitionableState {
 		}
 		if (potentialPartner.type == "cat" || potentialPartner.type == "catStatue") {
 			if (potentialPartner.params["type"] == "normal") {
-				showDialogBox(potentialPartner.params["text"].split("|"));
+				showDialogBox(potentialPartner.type, potentialPartner.params["text"].split("|"));
 			} else {
-				showDialogBox(getSpecialDialog(potentialPartner.params["type"]));
+				showDialogBox(potentialPartner.type, getSpecialDialog(potentialPartner.params["type"]));
 			}
 		}
 	}
@@ -592,9 +592,9 @@ class AbstractPlayState extends FlxTransitionableState {
 		return ["..."];
 	}
 	
-	public function showDialogBox(text:Array<String>) {
+	public function showDialogBox(type:String, text:Array<String>) {
 		showingDialogBox = true;
-		dialogBox = new DialogBox(text, function() { showingDialogBox = false; },
+		dialogBox = new DialogBox(type, text, function() { showingDialogBox = false; },
 		                          function() { showingDialogBox = false; handleMovement(); });
 		
 		interfaceLayer.add(dialogBox);

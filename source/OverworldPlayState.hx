@@ -27,6 +27,7 @@ class OverworldPlayState extends AbstractPlayState {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
 			    p.loc.x == shrineLocation.x && p.loc.y == shrineLocation.y) {
 				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: p.loc.x, y: p.loc.y + 1};
+				SoundManager.get().playSound("stairs");
 				FlxG.switchState(new ShrinePlayState(shrineLocation.id));
 				state = AbstractPlayState.State.Locked;
 			}

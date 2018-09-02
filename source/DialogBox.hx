@@ -24,7 +24,7 @@ class DialogBox extends FlxSpriteGroup {
 	
 	public var options:FlxSprite;
 	
-	public function new(messages:Array<String>, callback:Void -> Void, ?abortCallback:Void -> Void = null) {
+	public function new(type:String, messages:Array<String>, callback:Void -> Void, ?abortCallback:Void -> Void = null) {
 		super();
 		
 		this.messages = messages;
@@ -52,9 +52,13 @@ class DialogBox extends FlxSpriteGroup {
 		this.y = Main.GAME_HEIGHT - (bitmapData.height * Tile.TILE_SCALE);
 		
 		text = new FlxText(TEXT_PADDING_X, TEXT_PADDING_Y, Main.GAME_WIDTH - 2 * TEXT_PADDING_X, messages[0], 16);
-		text.setFormat(null, 16, FlxColor.BLACK);
+		text.setFormat("assets/pixelfont.TTF", 24, FlxColor.BLACK);
 		this.add(text);
-		SoundManager.get().playSound("advance");
+		if (type == "cat") {
+			SoundManager.get().playSound("mew");
+		} else {
+			SoundManager.get().playSound("advance");
+		}
 	}
 	
 	public function handleInput() {
@@ -66,7 +70,7 @@ class DialogBox extends FlxSpriteGroup {
 				index += 1;
 				text.destroy();
 				text = new FlxText(TEXT_PADDING_X, TEXT_PADDING_Y, Main.GAME_WIDTH - 2 * TEXT_PADDING_X, messages[index], 16);
-				text.setFormat(null, 16, FlxColor.BLACK);
+				text.setFormat("assets/pixelfont.TTF", 24, FlxColor.BLACK);
 				this.add(text);
 				SoundManager.get().playSound("advance");
 				

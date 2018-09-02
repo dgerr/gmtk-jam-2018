@@ -87,7 +87,7 @@
 {"tx":2, "ty":4, "x":3, "y":6, "type":"normal", "text":"What's it like living so close to a shrine?|Hmm... peaceful, mostly.|Good luck in there."}
 
 // 3,4
-{"tx":3, "ty":4, "x":4, "y":4, "type":"normal", "text":"I was a woodcatter when I was alive. | Ah, the memories..."}
+{"tx":3, "ty":4, "x":4, "y":3, "type":"normal", "text":"I was a woodcatter when I was alive. | Ah, the memories..."}
 
 // 4,4
 {"tx":4, "ty":4, "x":6, "y":4, "type":"normal", "text":"We zombie kitties aren't scary! We're just lonely...|Can we be friends? We can, right?"}
