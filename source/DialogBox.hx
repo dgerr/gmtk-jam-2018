@@ -44,7 +44,7 @@ class DialogBox extends FlxSpriteGroup {
 		var abort = FlxG.keys.anyJustPressed([LEFT, RIGHT, UP, DOWN, A, S, D, W]);
 		
 		if (advance) {
-			if (index < messages.length) {
+			if (index < messages.length - 1) {
 				index += 1;
 				text.destroy();
 				text = new FlxText(TEXT_PADDING_X, TEXT_PADDING_Y, Main.GAME_WIDTH - 2 * TEXT_PADDING_X, messages[index], 16);
