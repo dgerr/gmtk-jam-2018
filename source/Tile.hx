@@ -62,7 +62,10 @@ class Tile extends FlxSpriteGroup {
 				blit.copyPixels(srcBitmapData, TiledMapManager.getRectangleOfValue(bg[i][j]),
 								new Point(TILE_HEIGHT * j, TILE_WIDTH * i));
 				
-				for (source in [fg, fg2]) {
+				var fgs = [fg];
+				if (fg2 != null) fgs.push(fg2);
+				
+				for (source in fgs) {
 					var isWorldObject = false;
 					var woBitmapData:BitmapData = null;
 					var woAnimationFrames:Int = 0;
@@ -89,7 +92,8 @@ class Tile extends FlxSpriteGroup {
 										 new Point(TILE_HEIGHT * j, TILE_WIDTH * i), null, null, true);
 					}
 				}
-				for (arr in [bg, fg, fg2]) {
+				fgs.push(bg);
+				for (arr in fgs) {
 					if (arr[i][j] != -1) {
 						if (!tileCount.exists(arr[i][j])) {
 							tileCount[arr[i][j]] = 1;
@@ -115,7 +119,7 @@ class Tile extends FlxSpriteGroup {
 	}
 	
 	public function getSquare(loc:Object):Object {
-		var objToReturn:Object = {bg: tileObject.bg[loc.y][loc.x], fg: tileObject.fg[loc.y][loc.x], fg2: tileObject.fg2[loc.y][loc.x]};
+		var objToReturn:Object = {bg: tileObject.bg[loc.y][loc.x], fg: tileObject.fg[loc.y][loc.x], fg2: (tileObject.fg2 != null ? tileObject.fg2[loc.y][loc.x] : null)};
 		for (i in worldObjects) {
 			if (i.localX == loc.x && i.localY == loc.y) {
 				objToReturn.object = i;
@@ -221,7 +225,7 @@ class Tile extends FlxSpriteGroup {
 			return false;
 		}
 		var squareObj = getSquare(loc);
-		if (TiledMapManager.get().isSolid(squareObj.fg) || TiledMapManager.get().isSolid(squareObj.fg2) || (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
+		if (TiledMapManager.get().isSolid(squareObj.fg) || (squareObj.fg2 != null && TiledMapManager.get().isSolid(squareObj.fg2)) || (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
 			return false;
 		}
 		return true;
@@ -240,7 +244,8 @@ class Tile extends FlxSpriteGroup {
 	
 	public function isTerrainPathable(loc:Object):Bool {
 		var squareObj = getSquare(loc);
-		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg) || TiledMapManager.get().isSolid(squareObj.fg2)) {
+		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg) || 
+		    (squareObj.fg2 != null && TiledMapManager.get().isSolid(squareObj.fg2))) {
 			return false;
 		}
 		return true;

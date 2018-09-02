@@ -14,7 +14,7 @@ import sys.io.File;
 class TiledMapManager {
 	public var tiledLayer1:Array<Array<Int>>;
 	public var tiledLayer2:Array<Array<Int>>;
-	public var tiledLayer3:Array<Array<Int>>;
+	public var tiledLayer3:Array<Array<Int>> = null;
 	public var path:String = null;
 	
 	public var params:Array<Map<String, String>>;
@@ -48,35 +48,42 @@ class TiledMapManager {
 		this.path = path;
 		tiledLayer1 = new Array<Array<Int>>();
 		tiledLayer2 = new Array<Array<Int>>();
-		tiledLayer3 = new Array<Array<Int>>();
+		tiledLayer3 = null;
 		params = new Array<Map<String, String>>();
 		
 		var fin = File.read("assets/data/" + path + "_background.csv");
 		var fin2 = File.read("assets/data/" + path + "_foreground.csv");
-		var fin3 = File.read("assets/data/" + path + "_foreground2.csv");
+		var fin3 = null;
+		if (FileSystem.exists("assets/data/" + path + "_foreground2.csv")) {
+			tiledLayer3 = new Array<Array<Int>>();
+			fin3 = File.read("assets/data/" + path + "_foreground2.csv");
+		}
 		
 		try {
 			while (true) {
 				var line = fin.readLine().split(",");
 				var line2 = fin2.readLine().split(",");
-				var line3 = fin3.readLine().split(",");
 				
 				var build1 = [];
 				var build2 = [];
-				var build3 = [];
 				for (i in line) {
 					build1.push(Std.parseInt(i));
 				}
 				for (i in line2) {
 					build2.push(Std.parseInt(i));
 				}
-				for (i in line3) {
-					build3.push(Std.parseInt(i));
+				
+				if (tiledLayer3 != null) {
+					var line3 = fin3.readLine().split(",");
+					var build3 = [];
+					for (i in line3) {
+						build3.push(Std.parseInt(i));
+					}
+					tiledLayer3.push(build3);
 				}
 				
 				tiledLayer1.push(build1);
 				tiledLayer2.push(build2);
-				tiledLayer3.push(build3);
 			}
 		} catch (e:Eof) { }
 		
@@ -144,7 +151,8 @@ class TiledMapManager {
 		}
 		var builtArray:Array<Array<Int>> = new Array<Array<Int>>();
 		var builtArray2:Array<Array<Int>> = new Array<Array<Int>>();
-		var builtArray3:Array<Array<Int>> = new Array<Array<Int>>();
+		var builtArray3:Array<Array<Int>> = null;
+		if (tiledLayer3 != null) builtArray3 = new Array<Array<Int>>();
 		var builtParamsArray:Array<Array<Map<String, String>>> = new Array<Array<Map<String, String>>>();
 		
 		var sx = 11 * x;
@@ -153,7 +161,7 @@ class TiledMapManager {
 		for (i in 0...10) {
 			builtArray.push(tiledLayer1[sy + i].slice(sx, sx + 10));
 			builtArray2.push(tiledLayer2[sy + i].slice(sx, sx + 10));
-			builtArray3.push(tiledLayer3[sy + i].slice(sx, sx + 10));
+			if (tiledLayer3 != null) builtArray3.push(tiledLayer3[sy + i].slice(sx, sx + 10));
 		}
 		for (i in 0...10) {
 			builtParamsArray.push(new Array<Map<String, String>>());
