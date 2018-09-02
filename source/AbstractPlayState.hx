@@ -28,6 +28,7 @@ class AbstractPlayState extends FlxTransitionableState {
 	public var backgroundLayer:FlxSpriteGroup;
 	public var entityLayer:FlxSpriteGroup;
 	public var particleLayer:FlxSpriteGroup;
+	public var interfaceLayer:FlxSpriteGroup;
 	
 	public var p:Player;
 	
@@ -47,6 +48,9 @@ class AbstractPlayState extends FlxTransitionableState {
 	public var frameCount:Int = 0;
 	public var moveCount:Int = 0;
 	
+	public var showingDialogBox:Bool = false;
+	public var dialogBox:DialogBox = null;
+	
 	public var animatingObjects:Array<WorldObject>;
 	public var animatingDirections:Array<Object>;
 	
@@ -56,10 +60,12 @@ class AbstractPlayState extends FlxTransitionableState {
 		backgroundLayer = new FlxSpriteGroup();
 		entityLayer = new FlxSpriteGroup();
 		particleLayer = new FlxSpriteGroup();
+		interfaceLayer = new FlxSpriteGroup();
 		
 		add(backgroundLayer);
 		add(entityLayer);
 		add(particleLayer);
+		add(interfaceLayer);
 		
 		animatingObjects = new Array<WorldObject>();
 		animatingDirections = new Array<Object>();
@@ -151,6 +157,11 @@ class AbstractPlayState extends FlxTransitionableState {
         var _down = FlxG.keys.anyJustPressed([DOWN, S]);
         var _left = FlxG.keys.anyJustPressed([LEFT, A]);
         var _right = FlxG.keys.anyJustPressed([RIGHT, D]);
+		
+		if (showingDialogBox) {
+			dialogBox.handleInput();
+			return;
+		}
 		
 		if (state == State.Free) {
 			if (_up && !_down) {
@@ -373,6 +384,13 @@ class AbstractPlayState extends FlxTransitionableState {
 	public function killPlayer() {
 		localTileCoords = Utilities.cloneDirection(respawnTileCoords);
 		snapPlayerToTile();
+	}
+	
+	public function showDialogBox(text:String) {
+		showingDialogBox = true;
+		dialogBox = new DialogBox(text, function() { showingDialogBox = false; dialogBox.destroy(); });
+		
+		interfaceLayer.add(dialogBox);
 	}
 
 	override public function update(elapsed:Float):Void {

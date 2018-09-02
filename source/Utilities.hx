@@ -1,4 +1,7 @@
 package;
+
+import openfl.display.BitmapData;
+import openfl.geom.Matrix;
 import openfl.utils.Object;
 
 class Utilities {
@@ -15,6 +18,13 @@ class Utilities {
 			trace("Unknown direction " + dir);
 			return {x: 0, y: 0};
 		}
+	}
+	
+	public static function scaleBitmapData(bitmapData:BitmapData, scaleX:Int, scaleY:Int) {
+		var newBitmapData:BitmapData = new BitmapData(bitmapData.width * scaleX, bitmapData.height * scaleY, true, 0);
+		var mx:Matrix = new Matrix(scaleX, 0, 0, scaleY);
+		newBitmapData.draw(bitmapData, mx);
+		return newBitmapData;
 	}
 	
 	public static function cloneDirection(dir:Object) {
