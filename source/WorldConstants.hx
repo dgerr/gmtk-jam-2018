@@ -16,5 +16,6 @@ class WorldConstants {
 		 "shrine4" => {tx_start: 1, ty_start: 2, x_start: 5, y_start: 9}];
 	
 	public static var specialTileTypes:Map<Int, String> =
-		[ 67 => "crate", 91 => "playerCrate", 296 => "cannon" ];
+		[ 67 => "crate", 91 => "playerCrate", 296 => "cannon",
+		  336 => "cat", 337 => "cat", 338 => "cat", 360 => "cat", 361 => "cat", 362 => "cat" ];
 }

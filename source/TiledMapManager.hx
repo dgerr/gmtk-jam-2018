@@ -2,6 +2,7 @@ package;
 import flash.display.BitmapData;
 import flash.geom.Matrix;
 import flash.geom.Point;
+import haxe.Json;
 import haxe.io.Eof;
 import openfl.Assets;
 import openfl.geom.Rectangle;
@@ -75,15 +76,17 @@ class TiledMapManager {
 			var params_fin = File.read(params_path);
 			try {
 				while (true) {
-					var line = params_fin.readLine().split(",");
-					if (line.length > 3) {
-						var builtObject = new Map<String, String>();
-						for (pair in line) {
-							var pairSplit = pair.split(":");
-							builtObject[pairSplit[0]] = pairSplit[1];
-						}
-						params.push(builtObject);
+					var line:String = params_fin.readLine();
+					if (StringTools.trim(line) == "") {
+						break;
 					}
+					var lineJSON = Json.parse(line);
+					
+					var builtObject = new Map<String, String>();
+					for (key in Reflect.fields(lineJSON)) {
+						builtObject[key] = Reflect.field(lineJSON, key);
+					}
+					params.push(builtObject);
 				}
 			} catch (e:Eof) { }
 		}

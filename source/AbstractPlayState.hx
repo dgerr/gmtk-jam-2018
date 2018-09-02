@@ -34,6 +34,7 @@ class AbstractPlayState extends FlxTransitionableState {
 	
 	public var state:State = State.Free;
 	public var direction:Object;
+	public var facing:Object;
 	public var animFrames:Int;
 	
 	public var FRAMES_BETWEEN_TILE_MOVE:Int = 4;
@@ -73,6 +74,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		p = new Player();
 		
 		entityLayer.add(p);
+		facing = {x: 0, y: 1};
 		
 		FlxTransitionableState.defaultTransIn = new TransitionData();
 		FlxTransitionableState.defaultTransOut = new TransitionData();
@@ -99,6 +101,20 @@ class AbstractPlayState extends FlxTransitionableState {
 		localTileCoords.x += direction.x;
 		localTileCoords.y += direction.y;
 		
+		if (direction.x == -1) {
+			p._sprite.animation.play("l");
+			facing = {x: -1, y: 0};
+		} else if (direction.x == 1) {
+			p._sprite.animation.play("r");
+			facing = {x: 1, y: 0};
+		} else if (direction.y == 1) {
+			p._sprite.animation.play("d");
+			facing = {x: 0, y: 1};
+		} else {
+			p._sprite.animation.play("u");
+			facing = {x: 0, y: -1};
+		}
+		
 		if (localTileCoords.x >= 0 && localTileCoords.y >= 0 &&
 		    localTileCoords.x < 10 && localTileCoords.y < 10) {
 			var tileObject = currentTile.getSquare(localTileCoords);
@@ -120,16 +136,13 @@ class AbstractPlayState extends FlxTransitionableState {
 						animatingObjects.push(tileObject.object);
 						animatingDirections.push(Utilities.cloneDirection(direction));
 					}
+				} else {
+					// collision with unpushable WorldObject
+					state = State.Free;
+					localTileCoords.x -= direction.x;
+					localTileCoords.y -= direction.y;
+					return;
 				}
-			}
-			if (direction.x == -1) {
-				p._sprite.animation.play("l");
-			} else if (direction.x == 1) {
-				p._sprite.animation.play("r");
-			} else if (direction.y == 1) {
-				p._sprite.animation.play("d");
-			} else {
-				p._sprite.animation.play("u");
 			}
 			animatingObjects.push(p);
 			animatingDirections.push(Utilities.cloneDirection(direction));
@@ -179,6 +192,9 @@ class AbstractPlayState extends FlxTransitionableState {
 			if (!_left && _right) {
 				direction = {x: 1, y: 0};
 				startPlayerMove();
+			}
+			if (FlxG.keys.anyJustPressed([Z]) && state == State.Free) {
+				searchForDialog();
 			}
 			if (FlxG.keys.anyJustPressed([X]) && state == State.Free) {
 				state = State.CastingCane;
@@ -386,9 +402,22 @@ class AbstractPlayState extends FlxTransitionableState {
 		snapPlayerToTile();
 	}
 	
+	public function searchForDialog() {
+		var potentialPartner = currentTile.getObjectAtLoc({x: localTileCoords.x + facing.x, y: localTileCoords.y + facing.y});
+		if (potentialPartner == null) {
+			return;
+		}
+		if (potentialPartner.type == "cat") {
+			if (potentialPartner.params["type"] == "normal") {
+				showDialogBox(potentialPartner.params["text"]);
+			}
+		}
+	}
+	
 	public function showDialogBox(text:String) {
 		showingDialogBox = true;
-		dialogBox = new DialogBox(text, function() { showingDialogBox = false; dialogBox.destroy(); });
+		dialogBox = new DialogBox(text, function() { showingDialogBox = false; dialogBox.destroy(); },
+		                          function() { showingDialogBox = false; dialogBox.destroy(); handleMovement(); });
 		
 		interfaceLayer.add(dialogBox);
 	}
