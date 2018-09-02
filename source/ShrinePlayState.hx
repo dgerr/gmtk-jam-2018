@@ -6,16 +6,18 @@ using AbstractPlayState.State;
 
 class ShrinePlayState extends AbstractPlayState {
 	public var shrineID:String;
+	public var savePassedChecks:Bool = false;
 	
 	override public function create():Void {
 		super.create();
+		
 		TiledMapManager.get().loadTileSet(shrineID);
 		
 		tileCoords = {x: WorldConstants.shrineInfo[shrineID].tx_start, y: WorldConstants.shrineInfo[shrineID].ty_start};
-		localTileCoords = {x: WorldConstants.shrineInfo[shrineID].x_start, y: WorldConstants.shrineInfo[shrineID].y_start};
-		respawnTileCoords = Utilities.cloneDirection(localTileCoords);
+		p.loc = {x: WorldConstants.shrineInfo[shrineID].x_start, y: WorldConstants.shrineInfo[shrineID].y_start};
+		respawnTileCoords = Utilities.cloneDirection(p.loc);
 
-		currentTile = new Tile(TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
+		currentTile = new Tile(p, TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
 		
 		backgroundLayer.add(currentTile);
 		snapPlayerToTile();
@@ -27,12 +29,12 @@ class ShrinePlayState extends AbstractPlayState {
 		}
 		super.startResolveMove();
 		
-		var tileInfo = currentTile.getSquare(localTileCoords);
+		var tileInfo = currentTile.getSquare(p.loc);
 		var passedChecks = true;
 		
 		// check red squares
 		if (tileInfo.bg == 289) {
-			currentTile.setSquare(localTileCoords, 290);
+			currentTile.setSquare(p.loc, 290);
 		} else if (tileInfo.bg == 290) {
 			currentTile.changeAllSquares(289, 314);
 			currentTile.changeAllSquares(290, 314);
@@ -45,7 +47,7 @@ class ShrinePlayState extends AbstractPlayState {
 		if (currentTile.getNumTiles(294) > 0) {
 			for (i in 0...currentTile.tileObject.bg.length) {
 				for (j in 0...currentTile.tileObject.bg[i].length) {
-					if (currentTile.tileObject.fg[i][j] == 294 && (currentTile.isPathable({x: j, y: i}) && (localTileCoords.x != j || localTileCoords.y != i))) {
+					if (currentTile.tileObject.fg[i][j] == 294 && (currentTile.isPathable({x: j, y: i}) && (p.loc.x != j || p.loc.y != i))) {
 						passedChecks = false;
 						break;
 					}
@@ -56,20 +58,29 @@ class ShrinePlayState extends AbstractPlayState {
 		// spawn shadow clones
 		if (tileInfo.fg == 318) {
 			currentTile.removeObjectsOfType("shadow");
+			shadows.splice(0, shadows.length);
 			for (i in 0...currentTile.tileObject.bg.length) {
 				for (j in 0...currentTile.tileObject.bg[i].length) {
-					if (currentTile.tileObject.bg[i][j] == 319 && currentTile.isPathable({x: j, y: i})) {
-						//var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(319
-						//currentTile.addWorldObject(
+					if (currentTile.tileObject.fg[i][j] == 319 && currentTile.isPathable({x: j, y: i})) {
+						var wo:ShadowPlayer = new ShadowPlayer(["x" => Std.string(j), "y" => Std.string(i)]);
+						wo.type = "shadow";
+						currentTile.addWorldObject(wo);
+						shadows.push(wo);
 					}
 				}
 			}
 		}
+		if (FlxG.keys.pressed.C) passedChecks = true;
 		
-		if (passedChecks) {
-			currentTile.changeAllSquares(292, 23);
+		if (!savePassedChecks || WorldConstants.shrinesWithPermanentGates.indexOf(shrineID) == -1) {
+			if (passedChecks) {
+				savePassedChecks = true;
+				currentTile.changeAllSquares(292, 23);
+			} else {
+				currentTile.changeAllSquares(23, 292);
+			}
 		} else {
-			currentTile.changeAllSquares(23, 292);
+			currentTile.changeAllSquares(292, 23);
 		}
 		
 		if (tileInfo.fg == 312) {
@@ -80,8 +91,8 @@ class ShrinePlayState extends AbstractPlayState {
 
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
-			    localTileCoords.x == shrineLocation.x && localTileCoords.y == shrineLocation.y) {
-				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: localTileCoords.x, y: localTileCoords.y + 1};
+			    p.loc.x == shrineLocation.x && p.loc.y == shrineLocation.y) {
+				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: p.loc.x, y: p.loc.y + 1};
 				FlxG.switchState(new ShrinePlayState(shrineLocation.id));
 				state = State.Locked;
 			}
@@ -94,21 +105,22 @@ class ShrinePlayState extends AbstractPlayState {
 	public override function killPlayer() {
 		super.killPlayer();
 		
+		currentTile.removeObjectsOfType("shadow");
 		currentTile.changeAllSquares(290, 289);
 		currentTile.changeAllSquares(314, 289);
 	}
 
 	private override function startShift() {
-		tileCoords.x += direction.x;
-		tileCoords.y += direction.y;
+		tileCoords.x += playerDirection.x;
+		tileCoords.y += playerDirection.y;
 		
 		if (!TiledMapManager.get().hasTileObjectAt(tileCoords.x, tileCoords.y)) {
 			state = State.Locked;
 			FlxG.switchState(new OverworldPlayState());
 			return;
 		}
-		tileCoords.x -= direction.x;
-		tileCoords.y -= direction.y;
+		tileCoords.x -= playerDirection.x;
+		tileCoords.y -= playerDirection.y;
 		super.startShift();
 	}
 

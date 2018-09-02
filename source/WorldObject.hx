@@ -3,37 +3,41 @@ package;
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
 import openfl.display.BitmapData;
+import openfl.utils.Object;
 
 class WorldObject extends FlxSpriteGroup {
 	public var type:String;
-	public var localX: Int = 0;
-	public var localY: Int = 0;
+	public var loc: Object;
 	public var params:Map<String, String>;
+	public var _sprite:FlxSprite;
 	
 	public function new(bitmapData:BitmapData, type:String, params:Map<String, String>,
 					    ?animationFrames:Int = 0):Void {
 		super();
-		if (bitmapData == null) return;
 		
 		this.type = type;
 		this.params = params;
-		this.localX = Std.parseInt(params["x"]);
-		this.localY = Std.parseInt(params["y"]);
 		
-		var sp:FlxSprite = new FlxSprite();
-		if (animationFrames <= 0) {
-			sp.loadGraphic(bitmapData);
-		} else {
-			var animation:Array<Int> = new Array<Int>();
-			for (i in 0...animationFrames) {
-				animation.push(i);
-			}
-			sp.loadGraphic(bitmapData, true, Std.int(bitmapData.width / animationFrames), bitmapData.height);
-			sp.animation.add("normal", animation, 4, true);
-			sp.animation.play("normal");
+		if (params != null) {
+			loc = {x: Std.parseInt(params["x"]), y: Std.parseInt(params["y"])};
 		}
+		_sprite = new FlxSprite();
 		
-		add(sp);
+		if (bitmapData != null) {
+			if (animationFrames <= 0) {
+				_sprite.loadGraphic(bitmapData);
+			} else {
+				var animation:Array<Int> = new Array<Int>();
+				for (i in 0...animationFrames) {
+					animation.push(i);
+				}
+				_sprite.loadGraphic(bitmapData, true, Std.int(bitmapData.width / animationFrames), bitmapData.height);
+				_sprite.animation.add("normal", animation, 4, true);
+				_sprite.animation.play("normal");
+			}
+			
+			add(_sprite);
+		}
 	}
 	
 	public static function isSolid(worldObject:WorldObject) {
