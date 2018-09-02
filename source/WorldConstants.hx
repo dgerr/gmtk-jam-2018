@@ -21,7 +21,19 @@ class WorldConstants {
 		 "shrine5" => {tx_start: 0, ty_start: 1, x_start: 5, y_start: 9}];
 	
 	public static var tileAnimationFrames:Map<Int, Array<Int>> =
-		[484 => [484, 485, 486], 508 => [508, 509, 510], 532 => [532, 533, 534]];
+		[
+			// waterfall
+			484 => [484, 485, 486],
+			508 => [508, 509, 510],
+			532 => [532, 533, 534],
+
+			// grass
+			544 => [544, 545],
+			568 => [568, 569],
+			570 => [570, 571],
+			592 => [592, 593],
+			594 => [594, 595],
+			];
 	
 	public static var specialTileTypes:Map<Int, String> =
 		[ 67 => "crate", 91 => "playerCrate", 296 => "cannon",
