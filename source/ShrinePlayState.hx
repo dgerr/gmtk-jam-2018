@@ -35,6 +35,7 @@ class ShrinePlayState extends AbstractPlayState {
 		// check red squares
 		if (tileInfo.bg == 289) {
 			currentTile.setSquare(p.loc, 290);
+			SoundManager.get().playSound("step");
 		} else if (tileInfo.bg == 290) {
 			currentTile.changeAllSquares(289, 314);
 			currentTile.changeAllSquares(290, 314);

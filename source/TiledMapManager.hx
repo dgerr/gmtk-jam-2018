@@ -94,7 +94,10 @@ class TiledMapManager {
 				while (true) {
 					var line:String = params_fin.readLine();
 					if (StringTools.trim(line) == "") {
-						break;
+						continue;
+					}
+					if (StringTools.startsWith(line, "//")) {
+						continue;
 					}
 					var lineJSON = Json.parse(line);
 					
