@@ -410,6 +410,9 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (state != State.CastingCane) {
 			return;
 		}
+		if (!GameState.get().unlockedStaff) {
+			return;
+		}
 		var nx:Int = p.loc.x + playerDirection.x;
 		var ny:Int = p.loc.y + playerDirection.y;
 		
@@ -502,12 +505,12 @@ class AbstractPlayState extends FlxTransitionableState {
 	}
 	public function refreshKeyIndicator() {
 		var potentialPartner = currentTile.getObjectAtLoc({x: p.loc.x + facing.x, y: p.loc.y + facing.y});
-		if (potentialPartner != null && potentialPartner.type == "cat") {
+		if (potentialPartner != null && (potentialPartner.type == "cat" || potentialPartner.type == "catStatue")) {
 			if (!keyIndicatorAttached) {
 				interfaceLayer.add(keyIndicator);
 			}
 			keyIndicator.x = potentialPartner.x + Tile.REAL_TILE_WIDTH / 2 - 15;
-			keyIndicator.y = potentialPartner.y - 25;
+			keyIndicator.y = potentialPartner.y - 25 + (potentialPartner.type == "catStatue" ? -Tile.REAL_TILE_HEIGHT : 0);
 			keyIndicatorAttached = true;
 		} else {
 			if (keyIndicatorAttached) {
@@ -559,11 +562,34 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (potentialPartner == null) {
 			return;
 		}
-		if (potentialPartner.type == "cat") {
+		if (potentialPartner.type == "cat" || potentialPartner.type == "catStatue") {
 			if (potentialPartner.params["type"] == "normal") {
 				showDialogBox(potentialPartner.params["text"].split("|"));
+			} else {
+				showDialogBox(getSpecialDialog(potentialPartner.params["type"]));
 			}
 		}
+	}
+	
+	public function getSpecialDialog(type:String):Array<String> {
+		if (type == "elder") {
+			if (!GameState.get().unlockedStaff && GameState.get().shrinesBeaten >= 3) {
+				GameState.get().unlockedStaff = true;
+				return ["You're making excellent progress. Let me teach you an ancient magic spell...",
+				        "(You can use the [Kitten Box] ability! Press 'X' followed by a direction to summon a pushable crate!)",
+						"I wish you luck on your adventure. Now that you can summon boxes, seek out the shrine in our village to the southwest!"];
+			}
+			if (!GameState.get().shrineProgress.exists("shrine1")) {
+				return ["Please, adventurer! Help us rescue the 8 guardian cat spirits!", "I think I saw a shrine to the east. Try wandering that way."];
+			} else if (!GameState.get().shrineProgress.exists("shrine3")) {
+				return ["Good to see you again!", "Looking for another shrine? Try wandering to the north."];
+			} else if (!GameState.get().shrineProgress.exists("shrine2")) {
+				return ["Ah, you look like you're doing well!", "Looking for another shrine? Try wandering to the northwest."];
+			}
+			return ["Unfortunately, I'm an old cat. I haven't the energy to explore the world anymore. You'll need to find the other shrines on your own."];
+		}
+		trace("Unknown type " + type);
+		return ["..."];
 	}
 	
 	public function showDialogBox(text:Array<String>) {

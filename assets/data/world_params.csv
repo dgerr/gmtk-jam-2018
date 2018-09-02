@@ -1,5 +1,4 @@
 // old cat
-{"tx":3, "ty":3, "x":6, "y":4, "type":"normal", "text":"Please, stranger! Help us get back the 12 pieces of the cat statue?"}
 {"tx":3, "ty":3, "x":6, "y":6, "type":"normal", "text":"The pieces of the cat statue are hidden in shrines around the world!|There's a shrine a little to the north of here."}
 
 /////////////////////////////////////
@@ -68,7 +67,7 @@
 // 3,3
 {"tx":3, "ty":3, "x":2, "y":3, "type":"normal", "text":"What's going to happen to us, meow?"}
 {"tx":3, "ty":3, "x":4, "y":6, "type":"normal", "text":"Meow meow meeeow! | (Help us, traveller!)"}
-{"tx":3, "ty":3, "x":6, "y":4, "type":"normal", "text":"We're counting on you, stranger. | Purretty please!"}
+{"tx":3, "ty":3, "x":6, "y":4, "type":"elder"}
 
 // 4,3
 
