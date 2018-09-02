@@ -37,6 +37,21 @@ class WorldConstants {
 			// water?
 			202 => [202, 203],
 			226 => [226, 227],
+
+			// npcs
+			336 => [336, 360],  // glasses
+			337 => [337, 361],  // scary red
+			338 => [338, 362],  // small pink
+			339 => [339, 363],  // zombie
+			340 => [340, 364],  // ghost
+			341 => [341, 365],  // farmer
+			342 => [342, 366],  // elder
+			343 => [343, 367],  // small purple
+			344 => [344, 368],  // glasses purple
+			345 => [345, 369],  // glasses orange
+			346 => [346, 370],  // elder turned banker 
+			347 => [347, 371],  // small tan
+			348 => [348, 372],  // scary purple
 			];
 	
 	public static var specialTileTypes:Map<Int, String> =
