@@ -33,7 +33,7 @@ class DialogBox extends FlxSpriteGroup {
 		bgSprite.loadGraphic(Utilities.scaleBitmapData(bitmapData, Tile.TILE_SCALE, Tile.TILE_SCALE));
 		
 		options = new FlxSprite();
-		options.loadGraphic(Utilities.scaleBitmapData(Assets.getBitmapData("assets/images/dialogbox_options.png", Tile.TILE_SCALE, Tile.TILE_SCALE)), true, 30, 30);
+		options.loadGraphic(Utilities.scaleBitmapData(Assets.getBitmapData("assets/images/dialogbox_options.png"), Tile.TILE_SCALE, Tile.TILE_SCALE), true, 30, 30);
 		
 		this.add(bgSprite);
 		
