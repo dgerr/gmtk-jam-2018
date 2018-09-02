@@ -101,7 +101,10 @@ class ShrinePlayState extends AbstractPlayState {
 			p._sprite.animation.play("aloft");
 			SoundManager.get().stopMusic();
 			SoundManager.get().playSound("victory");
-			new FlxTimer().start(5, function(t:FlxTimer) { FlxG.switchState(new OverworldPlayState()); }, 1);
+			if (GameState.get().shrinesBeaten == 8 && !GameState.get().seenEndCutscene) {
+				GameState.get().overworldPosition = {tx: 3, ty: 3, x: 5, y: 4};
+			}
+			new FlxTimer().start(6, function(t:FlxTimer) { FlxG.switchState(new OverworldPlayState()); }, 1);
 		}
 
 		if (state == State.StartResolving) {

@@ -430,8 +430,10 @@ class AbstractPlayState extends FlxTransitionableState {
 											  wo.y - 10 + 20 * Std.int(i / 2),
 											  0.5,
 											  function(v) { v.y -= 0.5; v.alpha -= 0.1; });
+				SoundManager.get().playSound("puff");
 				particleLayer.add(p);
 			}
+			lockMoveFrameCount = FRAMES_TO_LOCK_MOVEMENT;
 			++moveCount;
 			state = State.StartResolving;
 			startResolveMove();
@@ -576,7 +578,7 @@ class AbstractPlayState extends FlxTransitionableState {
 			if (!GameState.get().unlockedStaff && GameState.get().shrinesBeaten >= 2) {
 				GameState.get().unlockedStaff = true;
 				return ["You're making excellent progress. Let me teach you an ancient magic spell...",
-				        "(You can use the [Kitten Box] ability! Press 'X' followed by a direction to summon a pushable crate!)",
+				        "(You can use the [Kitten Box] ability!)", "(Press 'X' followed by a direction to summon a pushable crate!)",
 						"I wish you luck on your adventure. Now that you can summon boxes, seek out the shrine in our village to the southwest!"];
 			}
 			if (!GameState.get().shrineProgress.exists("shrine1")) {

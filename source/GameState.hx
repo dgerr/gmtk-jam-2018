@@ -12,6 +12,9 @@ class GameState {
 	public var overworldPosition:Object;
 	public var unlockedStaff:Bool = false;
 	
+	public var seenStartCutscene:Bool = false;
+	public var seenEndCutscene:Bool = false;
+	
 	public static function get():GameState {
 		if (_manager == null) {
 			_manager = new GameState();
