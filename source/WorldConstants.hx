@@ -18,7 +18,9 @@ class WorldConstants {
 		 "shrine2" => {tx_start: 0, ty_start: 2, x_start: 4, y_start: 9},
 		 "shrine3" => {tx_start: 0, ty_start: 2, x_start: 4, y_start: 9},
 		 "shrine4" => {tx_start: 1, ty_start: 2, x_start: 5, y_start: 9},
-		 "shrine5" => {tx_start: 0, ty_start: 1, x_start: 5, y_start: 9}];
+		 "shrine5" => {tx_start: 0, ty_start: 1, x_start: 5, y_start: 9},
+		 "shrine6" => {tx_start: 1, ty_start: 2, x_start: 4, y_start: 9},
+		 "shrine7" => {tx_start: 0, ty_start: 1, x_start: 3, y_start: 9}];
 	
 	public static var tileAnimationFrames:Map<Int, Array<Int>> =
 		[
