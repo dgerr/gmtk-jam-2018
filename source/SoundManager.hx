@@ -6,7 +6,7 @@ import flixel.system.FlxSound;
 class SoundManager {
 	public static var _manager:SoundManager = null;
 	
-	public static var currentMusic:FlxSound;
+	public static var currentMusic:FlxSound = null;
 	
 	public static var soundMap:Map<String, FlxSound>;
 	
@@ -20,9 +20,9 @@ class SoundManager {
 	public function new() {
 		soundMap = new Map<String, FlxSound>();
 		
-		soundMap["step"] = FlxG.sound.load("assets/sounds/tile.wav");
+		soundMap["step"] = FlxG.sound.load(AssetPaths.tile__wav);
 
-		soundMap["shrine"] = FlxG.sound.load("assets/music/shrine.mp3");
+		soundMap["shrine"] = FlxG.sound.load(AssetPaths.shrine__wav);
 	}
 	
 	public function stopMusic() {
@@ -38,6 +38,7 @@ class SoundManager {
 			trace("No music with key " + musicName);
 			return;
 		}
+		trace("playing" + soundMap[musicName]);
 		currentMusic = soundMap[musicName];
 		currentMusic.play();
 	}

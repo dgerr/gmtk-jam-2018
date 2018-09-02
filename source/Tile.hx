@@ -2,7 +2,6 @@ package;
 
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
-import openfl.Assets;
 import openfl.display.BitmapData;
 import openfl.geom.Matrix;
 import openfl.geom.Point;
@@ -71,6 +70,13 @@ class Tile extends FlxSpriteGroup {
 					var isWorldObject = false;
 					var woBitmapData:BitmapData = null;
 					var woAnimationFrames:Int = 0;
+					if (source[i][j] == 339 || source[i][j] == 363) {
+						// zombie cat
+						var zombieCat:ZombieCat = new ZombieCat(["x" => Std.string(j), "y" => Std.string(i)]);
+						addWorldObject(zombieCat);
+						source[i][j] = -1;
+						continue;
+					}
 					if (WorldConstants.tileAnimationFrames.exists(source[i][j])) {
 						isWorldObject = true;
 						var frames:Array<Int> = WorldConstants.tileAnimationFrames[source[i][j]];

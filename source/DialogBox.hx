@@ -11,7 +11,7 @@ import openfl.display.BitmapData;
 class DialogBox extends FlxSpriteGroup {
 	public static inline var TEXT_PADDING_X:Int = 25;
 	public static inline var TEXT_PADDING_Y:Int = 20;
-	public static inline var OPTIONS_Y:Int = Main.GAME_HEIGHT - 40;
+	public static inline var OPTIONS_Y:Int = Main.GAME_HEIGHT - 60;
 	
 	public var bgSprite:FlxSprite;
 	public var text:FlxText;
@@ -89,9 +89,9 @@ class DialogBox extends FlxSpriteGroup {
 		
 		++frameCount;
 		
-		if (index < messages.length - 1 && frameCount % 20 == 0) {
+		if (index < messages.length - 1 && frameCount % 36 == 0) {
 			bounce = !bounce;
-			options.y = OPTIONS_Y + (bounce ? 15 : 0);
+			options.y = OPTIONS_Y + (bounce ? -10 : 0);
 		}
 	}
 }

@@ -1,10 +1,6 @@
 package;
 
-import flash.display.BitmapData;
 import flixel.FlxG;
-import flixel.FlxObject;
-import flixel.FlxSprite;
-import flixel.FlxState;
 import flixel.graphics.FlxGraphic;
 import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
@@ -170,6 +166,29 @@ class AbstractPlayState extends FlxTransitionableState {
 				animFrames = FRAMES_BETWEEN_TILE_MOVE;
 			}
 		}
+		
+		var sortedZombies = new Array<ZombieCat>();
+		for (obj in currentTile.worldObjects) {
+			if (obj.type == "zombie") {
+				sortedZombies.push(obj);
+			}
+		}
+		
+		for (zombie in sortedZombies) {
+			var dx = p.loc.x - zombie.loc.x;
+			var dy = p.loc.y - zombie.loc.y;
+			
+			var sdx = (dx < 0 ? -1 : (dx > 0 ? 1 : 0));
+			var sdy = (dy < 0 ? -1 : (dy > 0 ? 1 : 0));
+			
+			var tryX = {x: zombie.loc.x + sdx, y: zombie.loc.y};
+			var tryY = {x: zombie.loc.x, y: zombie.loc.y + sdy};
+			
+			if (Math.abs(dx) > Math.abs(dy)) {
+				
+			}
+		}
+		
 		if (state == State.Free) {
 			var nextLoc = {x: p.loc.x + playerDirection.x, y: p.loc.y + playerDirection.y};
 			if (!currentTile.isInBounds(nextLoc)) {
