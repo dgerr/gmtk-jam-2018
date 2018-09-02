@@ -10,7 +10,8 @@ class WorldObject extends FlxSpriteGroup {
 	public var localY: Int = 0;
 	public var params:Map<String, String>;
 	
-	public function new(bitmapData:BitmapData, type:String, params:Map<String, String>):Void {
+	public function new(bitmapData:BitmapData, type:String, params:Map<String, String>,
+					    ?animationFrames:Int = 0):Void {
 		super();
 		if (bitmapData == null) return;
 		
@@ -20,7 +21,17 @@ class WorldObject extends FlxSpriteGroup {
 		this.localY = Std.parseInt(params["y"]);
 		
 		var sp:FlxSprite = new FlxSprite();
-		sp.loadGraphic(bitmapData);
+		if (animationFrames <= 0) {
+			sp.loadGraphic(bitmapData);
+		} else {
+			var animation:Array<Int> = new Array<Int>();
+			for (i in 0...animationFrames) {
+				animation.push(i);
+			}
+			sp.loadGraphic(bitmapData, true, Std.int(bitmapData.width / animationFrames), bitmapData.height);
+			sp.animation.add("normal", animation, 4, true);
+			sp.animation.play("normal");
+		}
 		
 		add(sp);
 	}

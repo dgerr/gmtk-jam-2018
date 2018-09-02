@@ -363,6 +363,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		p.y += dy * (1.0 - Tile.TILE_HEIGHT / FRAMES_BETWEEN_TILE_SWITCH / Main.GAME_HEIGHT);
 		
 		if (animFrames == 0) {
+			currentTile.destroy();
 			currentTile = nextTile;
 			currentTile.x = 0;
 			currentTile.y = 0;
@@ -375,7 +376,6 @@ class AbstractPlayState extends FlxTransitionableState {
 			state = State.Free;
 			localTileCoords.x -= 10 * direction.x;
 			localTileCoords.y -= 10 * direction.y;
-			trace(currentTile.getSquare(localTileCoords));
 			if (currentTile.getSquare(localTileCoords).fg != 23) {
 				currentTile.changeAllSquares(23, 292);
 			}

@@ -45,6 +45,7 @@ class Tile extends FlxSpriteGroup {
 		
 		var bg:Array<Array<Int>> = tileObject.bg;
 		var fg:Array<Array<Int>> = tileObject.fg;
+		var fg2:Array<Array<Int>> = tileObject.fg2;
 		
 		tileCount = new Map<Int, Int>();
 		
@@ -61,47 +62,45 @@ class Tile extends FlxSpriteGroup {
 				blit.copyPixels(srcBitmapData, TiledMapManager.getRectangleOfValue(bg[i][j]),
 								new Point(TILE_HEIGHT * j, TILE_WIDTH * i));
 				
-				if (WorldConstants.specialTileTypes.exists(fg[i][j])) {
-					var tileData:BitmapData = new BitmapData(TILE_WIDTH, TILE_HEIGHT, true, 0);
-					tileData.copyPixels(srcBitmapData, TiledMapManager.getRectangleOfValue(fg[i][j]),
-									    new Point(0, 0), null, null, true);
-					var scaledTileData:BitmapData = new BitmapData(REAL_TILE_WIDTH, REAL_TILE_HEIGHT, true, 0);
-					var mx2 = new Matrix();
-					mx2.translate( -TILE_WIDTH / 2, -TILE_HEIGHT / 2);
-					if (tileObject.params[i][j].exists("direction")) {
-						var dir = tileObject.params[i][j].get("direction");
-						if (dir == "north") {
-							mx2.rotate(3 * Math.PI / 2);
-						} else if (dir == "west") {
-							mx2.rotate(Math.PI);
-						} else if (dir == "south") {
-							mx2.rotate(Math.PI / 2);
+				var fgs = [fg];
+				if (fg2 != null) fgs.push(fg2);
+				
+				for (source in fgs) {
+					var isWorldObject = false;
+					var woBitmapData:BitmapData = null;
+					var woAnimationFrames:Int = 0;
+					if (WorldConstants.tileAnimationFrames.exists(source[i][j])) {
+						isWorldObject = true;
+						var frames:Array<Int> = WorldConstants.tileAnimationFrames[source[i][j]];
+						woBitmapData = TiledMapManager.get().generateBitmapDataFromFrames(frames);
+						woAnimationFrames = frames.length;
+					} else if (WorldConstants.specialTileTypes.exists(source[i][j])) {
+						isWorldObject = true;
+						var direction = "east";
+						if (tileObject.params[i][j].exists("direction")) {
+							direction = tileObject.params[i][j].get("direction");
+						}
+						woBitmapData = TiledMapManager.get().getTileBitmapData(source[i][j], direction);
+					}
+
+					if (isWorldObject) {
+						var worldObject:WorldObject = new WorldObject(woBitmapData, WorldConstants.specialTileTypes[source[i][j]], tileObject.params[i][j], woAnimationFrames);
+						addWorldObject(worldObject);
+						source[i][j] = -1;
+					} else {
+						blit2.copyPixels(srcBitmapData, TiledMapManager.getRectangleOfValue(source[i][j]),
+										 new Point(TILE_HEIGHT * j, TILE_WIDTH * i), null, null, true);
+					}
+				}
+				fgs.push(bg);
+				for (arr in fgs) {
+					if (arr[i][j] != -1) {
+						if (!tileCount.exists(arr[i][j])) {
+							tileCount[arr[i][j]] = 1;
+						} else {
+							tileCount[arr[i][j]] += 1;
 						}
 					}
-					mx2.translate(TILE_WIDTH / 2, TILE_HEIGHT / 2);
-					mx2.scale(TILE_SCALE, TILE_SCALE);
-					scaledTileData.draw(tileData, mx2);
-					var worldObject:WorldObject = new WorldObject(scaledTileData, WorldConstants.specialTileTypes[fg[i][j]], tileObject.params[i][j]);
-					addWorldObject(worldObject);
-					fg[i][j] = -1;
-				} else {
-					blit2.copyPixels(srcBitmapData, new Rectangle(TILE_HEIGHT * (fg[i][j] % NUM_TILES_PER_TILEMAP_ROW),
-																  TILE_WIDTH * Std.int(fg[i][j] / NUM_TILES_PER_TILEMAP_ROW),
-																  TILE_WIDTH,
-																  TILE_HEIGHT),
-									 new Point(TILE_HEIGHT * j, TILE_WIDTH * i), null, null, true);
-				}
-				
-				if (!tileCount.exists(bg[i][j])) {
-					tileCount[bg[i][j]] = 1;
-				} else {
-					tileCount[bg[i][j]] += 1;
-				}
-
-				if (!tileCount.exists(fg[i][j])) {
-					tileCount[fg[i][j]] = 1;
-				} else {
-					tileCount[fg[i][j]] += 1;
 				}
 			}
 		}
@@ -120,7 +119,7 @@ class Tile extends FlxSpriteGroup {
 	}
 	
 	public function getSquare(loc:Object):Object {
-		var objToReturn:Object = {bg: tileObject.bg[loc.y][loc.x], fg: tileObject.fg[loc.y][loc.x]};
+		var objToReturn:Object = {bg: tileObject.bg[loc.y][loc.x], fg: tileObject.fg[loc.y][loc.x], fg2: (tileObject.fg2 != null ? tileObject.fg2[loc.y][loc.x] : null)};
 		for (i in worldObjects) {
 			if (i.localX == loc.x && i.localY == loc.y) {
 				objToReturn.object = i;
@@ -226,7 +225,7 @@ class Tile extends FlxSpriteGroup {
 			return false;
 		}
 		var squareObj = getSquare(loc);
-		if (TiledMapManager.get().isSolid(squareObj.fg) || (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
+		if (TiledMapManager.get().isSolid(squareObj.fg) || (squareObj.fg2 != null && TiledMapManager.get().isSolid(squareObj.fg2)) || (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
 			return false;
 		}
 		return true;
@@ -245,7 +244,8 @@ class Tile extends FlxSpriteGroup {
 	
 	public function isTerrainPathable(loc:Object):Bool {
 		var squareObj = getSquare(loc);
-		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg)) {
+		if (TiledMapManager.get().isSolid(squareObj.bg) || TiledMapManager.get().isSolid(squareObj.fg) || 
+		    (squareObj.fg2 != null && TiledMapManager.get().isSolid(squareObj.fg2))) {
 			return false;
 		}
 		return true;
