@@ -297,7 +297,11 @@ class AbstractPlayState extends FlxTransitionableState {
 			var moveY = tryObjectMove(zombie, tryY);
 			
 			var moveStrategy = "none";
-			if (moveX.length > 0) {
+			if (Math.abs(dx) > Math.abs(dy) && moveX.length > 0) {
+				moveStrategy = "x";
+			} else if (Math.abs(dy) > Math.abs(dx) && moveY.length > 0) {
+				moveStrategy = "y";
+			} else if (moveX.length > 0) {
 				moveStrategy = "x";
 			} else if (moveY.length > 0) {
 				moveStrategy = "y";

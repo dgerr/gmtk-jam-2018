@@ -9,7 +9,7 @@ class Player extends WorldObject {
 	public var spriteData:BitmapData;
 	
 	public function new():Void {
-		super(null, null, null);
+		super(null, "player", null);
 		
 		var rawSpriteData = Assets.getBitmapData("assets/images/cat_8.png");
 		
