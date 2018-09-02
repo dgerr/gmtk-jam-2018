@@ -33,6 +33,10 @@ class WorldConstants {
 			570 => [570, 571],
 			592 => [592, 593],
 			594 => [594, 595],
+
+			// water?
+			202 ==> [202, 203],
+			226 ==> [226, 227],
 			];
 	
 	public static var specialTileTypes:Map<Int, String> =
