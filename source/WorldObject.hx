@@ -40,7 +40,7 @@ class WorldObject extends FlxSpriteGroup {
 	}
 	
 	public static function isSolid(worldObject:WorldObject) {
-		if (worldObject.type == "fireball" || worldObject.type == "grass") return false;
+		if (worldObject.type == "fireball" || worldObject.type == "grass" || worldObject.type == "bridge") return false;
 		
 		return true;
 	}

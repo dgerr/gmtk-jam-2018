@@ -16,6 +16,8 @@ class DialogBox extends FlxSpriteGroup {
 	public var text:FlxText;
 	public var messages:Array<String>;
 	public var index:Int = 0;
+	public var bounce:Bool = false;
+	public var frameCount:Int = 0;
 	public var callback:Void -> Void = null;
 	public var abortCallback:Void -> Void = null;
 	
@@ -34,6 +36,11 @@ class DialogBox extends FlxSpriteGroup {
 		
 		options = new FlxSprite();
 		options.loadGraphic(Utilities.scaleBitmapData(Assets.getBitmapData("assets/images/dialogbox_options.png"), Tile.TILE_SCALE, Tile.TILE_SCALE), true, 30, 30);
+		options.animation.add("next", [0], 0);
+		options.animation.add("finish", [1], 0);
+		options.animation.play("next");
+		options.x = Main.GAME_WIDTH - 50;
+		options.y = Main.GAME_HEIGHT - 100;
 		
 		this.add(bgSprite);
 		
@@ -55,6 +62,11 @@ class DialogBox extends FlxSpriteGroup {
 				text = new FlxText(TEXT_PADDING_X, TEXT_PADDING_Y, Main.GAME_WIDTH - 2 * TEXT_PADDING_X, messages[index], 16);
 				text.setFormat(null, 16, FlxColor.BLACK);
 				this.add(text);
+				
+				if (index == messages.length - 1) {
+					options.animation.play("finish");
+					options.y = Main.GAME_HEIGHT - 100;
+				}
 			} else {
 				if (callback != null) {
 					callback();
@@ -67,6 +79,17 @@ class DialogBox extends FlxSpriteGroup {
 				abortCallback();
 				this.destroy();
 			}
+		}
+	}
+
+	override public function update(elapsed:Float):Void {
+		super.update(elapsed);
+		
+		++frameCount;
+		
+		if (index < messages.length - 1 && frameCount % 20 == 0) {
+			bounce = !bounce;
+			options.y = Main.GAME_HEIGHT - 100 + (bounce ? 20 : 0);
 		}
 	}
 }

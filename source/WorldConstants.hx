@@ -62,6 +62,7 @@ class WorldConstants {
 
 	public static var specialTileTypes:Map<Int, String> =
 		[ 67 => "crate", 91 => "playerCrate", 296 => "cannon",
+		  316 => "bridge", 317 => "bridge",
 		  544 => "grass", 568 => "grass", 570 => "grass", 592 => "grass", 594 => "grass",
 		  336 => "cat", 337 => "cat", 338 => "cat", 360 => "cat", 361 => "cat", 362 => "cat",
 		  339 => "cat", 340 => "cat", 341 => "cat", 342 => "cat", 343 => "cat", 344 => "cat",
