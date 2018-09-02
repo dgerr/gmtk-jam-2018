@@ -56,43 +56,69 @@
 /////////////////////////////////////
 // 0,3
 {"tx":0, "ty":3, "x":8, "y":3, "type":"normal", "text":"I used to live here when I was alive.  | But I'm a ghost meow! | ...boo!! | ... | ...not very scary, I guess... "}
+{"tx":0, "ty":3, "x":2, "y":6, "type":"normal", "text":"Play with us! Play with us!"}
+{"tx":0, "ty":3, "x":3, "y":6, "type":"normal", "text":"We usually play with the ghost up the street, but she's too good at hide-and-seek..."}
 
 // 1,3
-{"tx":1, "ty":3, "x":2, "y":6, "type":"normal", "text":"Play with us! Play with us!"}
-{"tx":1, "ty":3, "x":3, "y":6, "type":"normal", "text":"We usually play with the ghost up the street, but she's too good at hide-and-seek..."}
+{"tx":1, "ty":3, "x":5, "y":3, "type":"normal", "text":"I like to get away from the town and nap under the trees...|Zzz......."}
 
 // 2,3
-{"tx":2, "ty":3, "x":5, "y":3, "type":"normal", "text":"I like to get away from the town and nap under the trees.|Zzz..."}
+{"tx":2, "ty":3, "x":4, "y":5, "type":"normal", "text":"Have you seen my little sister?|Small, pink, likes to get away from town and nap under the trees...|But I haven't seen her...|Maybe I'll take a nap too, meow..."}
 
 // 3,3
+{"tx":3, "ty":3, "x":2, "y":3, "type":"normal", "text":"What's going to happen to us, meow?"}
+{"tx":3, "ty":3, "x":4, "y":6, "type":"normal", "text":"Meow meow meeeow! | (Help us, traveller!)"}
+{"tx":3, "ty":3, "x":6, "y":4, "type":"normal", "text":"We're counting on you, stranger. | Purretty please!"}
 
 // 4,3
 
 // 5,3
+{"tx":5, "ty":3, "x":4, "y":3, "type":"normal", "text":"Are you looking for my husband? He's outside tending the flowers. | ...we don't look scary to you? | Really?? | Aren't you sweet!!!"}
+
 /////////////////////////////////////
 /////////////////////////////////////
 // 0,4
+{"tx":0, "ty":4, "x":2, "y":3, "type":"normal", "text":"It's a beautiful day in the neighborhood ♫"}
+{"tx":0, "ty":4, "x":4, "y":1, "type":"normal", "text":"Grandpa is taking me fishing today! Yaaay! | You're looking for shrines? We don't have any, silly... this is the town square!"}
+{"tx":0, "ty":4, "x":6, "y":4, "type":"normal", "text":"Do you like my glasses? I'm thinking I should get a new pair...|You like them very much? Oh, thank you!|Meow, maybe I'll keep these after all..."}
 
 // 1,4
 
 // 2,4
+{"tx":2, "ty":4, "x":3, "y":6, "type":"normal", "text":"What's it like living so close to a shrine?|Hmm... peaceful, mostly.|Good luck in there."}
 
 // 3,4
+{"tx":3, "ty":4, "x":4, "y":4, "type":"normal", "text":"I was a woodcatter when I was alive. | Ah, the memories..."}
 
 // 4,4
+{"tx":4, "ty":4, "x":6, "y":4, "type":"normal", "text":"We zombie kitties aren't scary! We're just lonely...|Can we be friends? We can, right?"}
 
 // 5,4
+{"tx":5, "ty":4, "x":4, "y":6, "type":"normal", "text":"We meet every Friday. I'm learning to speak zombie!"}
+{"tx":5, "ty":4, "x":5, "y":6, "type":"normal", "text":"Grghghh rhgrhrhgh hgrghh. |(She learns very fast.)"}
 /////////////////////////////////////
 /////////////////////////////////////
 // 0,5
+{"tx":0, "ty":5, "x":6, "y":3, "type":"normal", "text":"Huh? You saw me earlier? | That was probably my twin brother. | People say we look similar... but I'm MUCH more handsome!"}
+{"tx":0, "ty":5, "x":2, "y":5, "type":"normal", "text":"My brother lives in the woods, far to the east. | He loves nature and gardening. | Me? I'm a city kitty."}
+{"tx":0, "ty":5, "x":5, "y":5, "type":"normal", "text":"When I was a wee kit, I challenged the shrines, many times! | But I couldn't make heads or tails of them. | Meowadays I grow turnips... and I'm much happier."}
 
 // 1,5
+{"tx":1, "ty":5, "x":2, "y":3, "type":"normal", "text":"I'm not the mayor, but I look like him, or so they tell me."}
+{"tx":1, "ty":5, "x":5, "y":8, "type":"normal", "text":"What are you looking at, punk? | ... | ... Sorry! Sorry! I just wanted to sound cool."}
 
 // 2,5
+{"tx":2, "ty":5, "x":2, "y":5, "type":"normal", "text":"This place is enchanted... can you feel it?"}
 
 // 3,5
+{"tx":3, "ty":5, "x":4, "y":2, "type":"normal", "text":"We're here on a study break!"}
+{"tx":3, "ty":5, "x":5, "y":2, "type":"normal", "text":"(Study break? I was going to ask you out...)"}
 
 // 4,5
+{"tx":4, "ty":5, "x":3, "y":4, "type":"normal", "text":"Zombie line! Zombie line!"}
+{"tx":4, "ty":5, "x":4, "y":4, "type":"normal", "text":"Congo line! Congo line!"}
+{"tx":4, "ty":5, "x":5, "y":4, "type":"normal", "text":"Congo!|Zombie!|Liiiine!!!!"}
+{"tx":4, "ty":5, "x":6, "y":4, "type":"normal", "text":"I... I think we're in a line...|(I'm shy...)|...|Oh, you're looking for the shrine? It's that way!|Right, I mean. Meow meow."}
 
 // 5,5
 /////////////////////////////////////
