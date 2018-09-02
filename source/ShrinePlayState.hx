@@ -79,8 +79,6 @@ class ShrinePlayState extends AbstractPlayState {
 			} else {
 				currentTile.changeAllSquares(23, 292);
 			}
-		} else {
-			currentTile.changeAllSquares(292, 23);
 		}
 		
 		if (tileInfo.fg == 312) {
@@ -121,6 +119,7 @@ class ShrinePlayState extends AbstractPlayState {
 		}
 		tileCoords.x -= playerDirection.x;
 		tileCoords.y -= playerDirection.y;
+		savePassedChecks = false;
 		super.startShift();
 	}
 
