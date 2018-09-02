@@ -9,9 +9,9 @@ class WorldConstants {
 		  {tx: 3, ty: 1, x: 4, y: 3, id: "shrine3"},
 		  {tx: 2, ty: 5, x: 6, y: 4, id: "shrine4"},
 		  {tx: 1, ty: 2, x: 4, y: 5, id: "shrine5"},
-		  {tx: 5, ty: 0, x: 7, y: 2, id: "shrine6"}
+		  {tx: 5, ty: 0, x: 7, y: 2, id: "shrine6"},
 		  {tx: 0, ty: 0, x: 7, y: 5, id: "shrine7"},
-		  {tx: 5, ty: 5, x: 4, y: 5, id: "shrine8"},
+		  {tx: 5, ty: 5, x: 4, y: 5, id: "shrine8"}
 		];
 		  
 	public static var shrineInfo:Map<String, Object> =
