@@ -1,2 +1,100 @@
-{"tx":4, "ty":4, "x":2, "y":3, "type":"normal", "text":"Please, stranger! Help us get back the 12 pieces of the cat statue?"}
-{"tx":4, "ty":4, "x":7, "y":5, "type":"normal", "text":"The pieces of the cat statue are hidden in shrines around the world!|There's a shrine a little to the north of here."}
+// old cat
+{"tx":3, "ty":3, "x":6, "y":4, "type":"normal", "text":"Please, stranger! Help us get back the 12 pieces of the cat statue?"}
+{"tx":3, "ty":3, "x":6, "y":6, "type":"normal", "text":"The pieces of the cat statue are hidden in shrines around the world!|There's a shrine a little to the north of here."}
+
+/////////////////////////////////////
+// 0,0
+{"tx":0, "ty":0, "x":1, "y":4, "type":"normal", "text":"This bridge feels magical... |I'm scared......."}
+
+// 1,0
+
+// 2,0
+{"tx":2, "ty":0, "x":3, "y":1, "type":"normal", "text":"It's so quiet here... | Meeeeowwwww..."}
+
+// 3,0
+
+// 4,0
+
+// 5,0
+/////////////////////////////////////
+/////////////////////////////////////
+// 0,1
+
+// 1,1
+{"tx":1, "ty":1, "x":7, "y":2, "type":"normal", "text":"It's nice living on an island all by yourself. Meow~ | Do I get lonely? Not really. I play DOTA with my friends! | Also, I can just walk to town..."}
+
+// 2,1
+
+// 3,1
+
+// 4,1
+
+// 5,1
+/////////////////////////////////////
+/////////////////////////////////////
+// 0,2
+{"tx":0, "ty":2, "x":1, "y":0, "type":"normal", "text":"You accuse me, a proud farmer, of coming out here and FISHING? And... bringing my DAUGHTER?! | You DARE!?!?!!?!?"}
+{"tx":0, "ty":2, "x":2, "y":0, "type":"normal", "text":"Papa! I want to fish, too!"}
+
+// 1,2
+
+// 2,2
+
+// 3,2
+{"tx":3, "ty":2, "x":1, "y":7, "type":"normal", "text":"Orange glasses are the best! You agree with me, right? | I knew it!"}
+{"tx":0, "ty":2, "x":8, "y":2, "type":"normal", "text":"Bro...... orange glasses are lame. | Purple? Totally different story, dude. | Meow."}
+
+
+// 4,2
+{"tx":4, "ty":2, "x":7, "y":3, "type":"normal", "text":"Water fall! Water fall!"}
+{"tx":4, "ty":2, "x":7, "y":4, "type":"normal", "text":"Where does all that water go? | Meowbody knows..."}
+
+// 5,2
+{"tx":5, "ty":2, "x":5, "y":5, "type":"normal", "text":"Welcome to our home! Did you come to see the waterfall?"}
+{"tx":5, "ty":2, "x":2, "y":7, "type":"normal", "text":"I'm going to be a gardener when I grow up!"}
+/////////////////////////////////////
+/////////////////////////////////////
+// 0,3
+{"tx":0, "ty":3, "x":8, "y":3, "type":"normal", "text":"I used to live here when I was alive.  | But I'm a ghost meow! | ...boo!! | ... | ...not very scary, I guess... "}
+
+// 1,3
+{"tx":0, "ty":3, "x":2, "y":6, "type":"normal", "text":"Play with us! Play with us!"}
+{"tx":0, "ty":3, "x":3, "y":6, "type":"normal", "text":"We usually play with the ghost up the street, but she's too good at hide-and-seek..."}
+
+// 2,3
+{"tx":0, "ty":3, "x":5, "y":3, "type":"normal", "text":"I like to get away from the town and nap under the trees.|Zzz..."}
+
+// 3,3
+
+// 4,3
+
+// 5,3
+/////////////////////////////////////
+/////////////////////////////////////
+// 0,4
+
+// 1,4
+
+// 2,4
+
+// 3,4
+
+// 4,4
+
+// 5,4
+/////////////////////////////////////
+/////////////////////////////////////
+// 0,5
+
+// 1,5
+
+// 2,5
+
+// 3,5
+
+// 4,5
+
+// 5,5
+/////////////////////////////////////
+/////////////////////////////////////
+
