@@ -103,16 +103,16 @@ class AbstractPlayState extends FlxTransitionableState {
 		
 		if (direction.x == -1) {
 			if (wo.type != "zombie") wo._sprite.animation.play("l");
-			facing = {x: -1, y: 0};
+			if (wo.type == "player") facing = {x: -1, y: 0};
 		} else if (direction.x == 1) {
 			if (wo.type != "zombie") wo._sprite.animation.play("r");
-			facing = {x: 1, y: 0};
+			if (wo.type == "player") facing = {x: 1, y: 0};
 		} else if (direction.y == 1) {
 			if (wo.type != "zombie") wo._sprite.animation.play("d");
-			facing = {x: 0, y: 1};
+			if (wo.type == "player") facing = {x: 0, y: 1};
 		} else {
 			if (wo.type != "zombie") wo._sprite.animation.play("u");
-			facing = {x: 0, y: -1};
+			if (wo.type == "player") facing = {x: 0, y: -1};
 		}
 		
 		if (currentTile.isInBounds(nextLoc)) {
