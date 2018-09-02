@@ -24,6 +24,7 @@ class SoundManager {
 		soundMap["stairs"] = "assets/sounds/stairs.wav";
 		soundMap["advance"] = "assets/sounds/advance.wav";
 		soundMap["victory"] = "assets/sounds/victory.wav";
+		soundMap["puff"] = "assets/sounds/puff.wav";
 
 		soundMap["shrine"] = AssetPaths.shrine__wav;
 		soundMap["overworld"] = "assets/music/overworld_generic.wav";
@@ -35,7 +36,7 @@ class SoundManager {
 	
 	public function playMusic(musicName:String):Void {
 		var volume:Float = 1.0;
-		if (musicName == "shrine") volume = 0.3;
+		volume = 0.3;
 		FlxG.sound.playMusic(soundMap[musicName], volume);
 	}
 

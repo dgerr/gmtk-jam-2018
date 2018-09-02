@@ -69,6 +69,7 @@ class WorldConstants {
 		  336 => "cat", 337 => "cat", 338 => "cat", 360 => "cat", 361 => "cat", 362 => "cat",
 		  339 => "cat", 340 => "cat", 341 => "cat", 342 => "cat", 343 => "cat", 344 => "cat",
 		  345 => "cat", 346 => "cat", 347 => "cat", 348 => "cat", 363 => "cat", 364 => "cat",
+		  624 => "catStatue", 625 => "catStatue",
 		  626 => "catStatue", 627 => "catStatue", 628 => "catStatue", 672 => "catStatue",
 		  673 => "catStatue", 674 => "catStatue", 675 => "catStatue", 676 => "catStatue"];
 	

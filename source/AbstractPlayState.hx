@@ -532,7 +532,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (frameCount % 2 == 0) {
 			for (row in 0...currentTile.tileObject.bg.length) {
 				for (col in 0...currentTile.tileObject.bg[row].length) {
-					if (currentTile.tileObject.fg[row][col] == 380) {
+					/*if (currentTile.tileObject.fg[row][col] == 380) {
 						var p:Particle = new Particle("particles/sparkle.png",
 													  col * Tile.REAL_TILE_WIDTH + 0.1 * Tile.REAL_TILE_WIDTH + 0.8 * Std.random(Tile.REAL_TILE_WIDTH + 1),
 													  row * Tile.REAL_TILE_HEIGHT + 0.1 * Tile.REAL_TILE_HEIGHT + 0.9 * Std.random(Tile.REAL_TILE_HEIGHT + 1),
@@ -540,7 +540,7 @@ class AbstractPlayState extends FlxTransitionableState {
 													  function(v) { v.y -= 0.3; v.alpha -= 0.05; },
 													  {rows: 1, cols: 4, animation: [0, 1, 2, 3]});
 						particleLayer.add(p);
-					}
+					}*/
 				}
 			}
 		}
