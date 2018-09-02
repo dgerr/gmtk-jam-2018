@@ -28,15 +28,17 @@ class Tile extends FlxSpriteGroup {
 	
 	public var tileCount:Map<Int, Int>;
 	
+	public var playerRef:Player;
 	public var worldObjects:Array<WorldObject>;
 	public var worldObjectsLayer:FlxSpriteGroup;
 	
-	public function new(tileObject:Object):Void {
+	public function new(playerRef:Player, tileObject:Object):Void {
 		super();
 		
 		widthInTiles = 10;
 		heightInTiles = 10;
 		
+		this.playerRef = playerRef;
 		this.tileObject = tileObject;
 		worldObjects = new Array<WorldObject>();
 		worldObjectsLayer = new FlxSpriteGroup();
@@ -121,9 +123,12 @@ class Tile extends FlxSpriteGroup {
 	public function getSquare(loc:Object):Object {
 		var objToReturn:Object = {bg: tileObject.bg[loc.y][loc.x], fg: tileObject.fg[loc.y][loc.x], fg2: (tileObject.fg2 != null ? tileObject.fg2[loc.y][loc.x] : null)};
 		for (i in worldObjects) {
-			if (i.localX == loc.x && i.localY == loc.y) {
+			if (i.loc.x == loc.x && i.loc.y == loc.y) {
 				objToReturn.object = i;
 			}
+		}
+		if (playerRef.loc.x == loc.x && playerRef.loc.y == loc.y) {
+			objToReturn.object = playerRef;
 		}
 		return objToReturn;
 	}
@@ -182,7 +187,7 @@ class Tile extends FlxSpriteGroup {
 	
 	public function getObjectAtLoc(loc:Object):WorldObject {
 		for (worldObject in worldObjects) {
-			if (worldObject.localX == loc.x && worldObject.localY == loc.y) {
+			if (worldObject.loc.x == loc.x && worldObject.loc.y == loc.y) {
 				return worldObject;
 			}
 		}
@@ -191,7 +196,16 @@ class Tile extends FlxSpriteGroup {
 	
 	public function removeObjectsAtLoc(loc:Object) {
 		for (worldObject in worldObjects) {
-			if (worldObject.localX == loc.x && worldObject.localY == loc.y) {
+			if (worldObject.loc.x == loc.x && worldObject.loc.y == loc.y) {
+				worldObjectsLayer.remove(worldObject);
+				worldObjects.remove(worldObject);
+			}
+		}
+	}
+	
+	public function removeObjectsAtLocOtherThan(wo:WorldObject) {
+		for (worldObject in worldObjects) {
+			if (worldObject != wo && worldObject.loc.x == wo.x && worldObject.loc.y == wo.y) {
 				worldObjectsLayer.remove(worldObject);
 				worldObjects.remove(worldObject);
 			}
@@ -254,7 +268,7 @@ class Tile extends FlxSpriteGroup {
 	public function addWorldObject(worldObject:WorldObject) {
 		worldObjects.push(worldObject);
 		worldObjectsLayer.add(worldObject);
-		worldObject.x = REAL_TILE_WIDTH * worldObject.localX;
-		worldObject.y = REAL_TILE_HEIGHT * worldObject.localY;
+		worldObject.x = REAL_TILE_WIDTH * worldObject.loc.x;
+		worldObject.y = REAL_TILE_HEIGHT * worldObject.loc.y;
 	}
 }

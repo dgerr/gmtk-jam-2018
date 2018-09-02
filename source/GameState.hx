@@ -20,6 +20,6 @@ class GameState {
 	public function new() {
 		shrineProgress = new Map<String, Int>();
 		
-		overworldPosition = {tx: 4, ty: 4, x: 4, y: 4};
+		overworldPosition = WorldConstants.START_LOCATION;
 	}
 }

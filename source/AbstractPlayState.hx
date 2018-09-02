@@ -32,8 +32,10 @@ class AbstractPlayState extends FlxTransitionableState {
 	
 	public var p:Player;
 	
+	public var shadows:Array<ShadowPlayer>;
+	
 	public var state:State = State.Free;
-	public var direction:Object;
+	public var playerDirection:Object;
 	public var facing:Object;
 	public var animFrames:Int;
 	
@@ -41,7 +43,6 @@ class AbstractPlayState extends FlxTransitionableState {
 	public var FRAMES_BETWEEN_TILE_SWITCH:Int = 15;
 	
 	public var tileCoords:Object;
-	public var localTileCoords:Object;
 	public var respawnTileCoords:Object;
 	
 	public var currentTile:Tile;
@@ -73,6 +74,8 @@ class AbstractPlayState extends FlxTransitionableState {
 		
 		p = new Player();
 		
+		shadows = new Array<ShadowPlayer>();
+		
 		entityLayer.add(p);
 		facing = {x: 0, y: 1};
 		
@@ -93,76 +96,95 @@ class AbstractPlayState extends FlxTransitionableState {
 	}
 	
 	private function snapPlayerToTile() {
-		p.x = Tile.REAL_TILE_WIDTH * localTileCoords.x;
-		p.y = Tile.REAL_TILE_HEIGHT * localTileCoords.y;
+		p.x = Tile.REAL_TILE_WIDTH * p.loc.x;
+		p.y = Tile.REAL_TILE_HEIGHT * p.loc.y;
 	}
 	
-	private function startPlayerMove() {
-		localTileCoords.x += direction.x;
-		localTileCoords.y += direction.y;
+	private function tryObjectMove(wo:WorldObject, direction:Object):Array<WorldObject> {
+		var nextLoc = {x: wo.loc.x + direction.x, y: wo.loc.y + direction.y};
 		
 		if (direction.x == -1) {
-			p._sprite.animation.play("l");
+			wo._sprite.animation.play("l");
 			facing = {x: -1, y: 0};
 		} else if (direction.x == 1) {
-			p._sprite.animation.play("r");
+			wo._sprite.animation.play("r");
 			facing = {x: 1, y: 0};
 		} else if (direction.y == 1) {
-			p._sprite.animation.play("d");
+			wo._sprite.animation.play("d");
 			facing = {x: 0, y: 1};
 		} else {
-			p._sprite.animation.play("u");
+			wo._sprite.animation.play("u");
 			facing = {x: 0, y: -1};
 		}
-		
-		if (localTileCoords.x >= 0 && localTileCoords.y >= 0 &&
-		    localTileCoords.x < 10 && localTileCoords.y < 10) {
-			var tileObject = currentTile.getSquare(localTileCoords);
-			if (!currentTile.isTerrainPathable(localTileCoords)) {
+		if (currentTile.isInBounds(nextLoc)) {
+			var tileObject = currentTile.getSquare(nextLoc);
+			if (!currentTile.isTerrainPathable(nextLoc)) {
 				// collision with solid object
-				state = State.Free;
-				localTileCoords.x -= direction.x;
-				localTileCoords.y -= direction.y;
-				return;
+				return [];
 			}
 			if (tileObject.object != null) {
 				if (WorldObject.isPushable(tileObject.object)) {
-					if (!currentTile.isPathable({x: localTileCoords.x + direction.x, y: localTileCoords.y + direction.y})) {
-						state = State.Free;
-						localTileCoords.x -= direction.x;
-						localTileCoords.y -= direction.y;
-						return;
+					if (!currentTile.isPathable({x: nextLoc.x + direction.x, y: nextLoc.y + direction.y})) {
+						return [];
 					} else {
-						animatingObjects.push(tileObject.object);
-						animatingDirections.push(Utilities.cloneDirection(direction));
+						return [wo, tileObject.object];
 					}
 				} else if (WorldObject.isSolid(tileObject.object)) {
 					// collision with unpushable WorldObject
-					state = State.Free;
-					localTileCoords.x -= direction.x;
-					localTileCoords.y -= direction.y;
-					return;
+					return [];
 				}
 			}
-			animatingObjects.push(p);
-			animatingDirections.push(Utilities.cloneDirection(direction));
-			state = State.PlayerMoving;
-			animFrames = FRAMES_BETWEEN_TILE_MOVE;
-		} else {
-			startShift();
+			return [wo];
+		}
+		return [];
+	}
+	
+	private function startPlayerMove() {
+		if (state != State.Free) {
+			return;
+		}
+		
+		var sortedPlayers = new Array<WorldObject>();
+		sortedPlayers.push(p);
+		for (shadow in shadows) {
+			sortedPlayers.push(shadow);
+		}
+		sortedPlayers.sort(function(wo1, wo2) {
+			return Std.int((wo2.loc.x - wo1.loc.x) * playerDirection.x + (wo2.loc.y - wo1.loc.y) * playerDirection.y);
+		});
+		
+		for (obj in sortedPlayers) {
+			var pushedObjects:Array<WorldObject> = tryObjectMove(obj, playerDirection);
+			
+			if (pushedObjects.length > 0) {
+				for (object in pushedObjects) {
+					animatingObjects.push(object);
+					animatingDirections.push(Utilities.cloneDirection(playerDirection));
+					object.loc.x += playerDirection.x;
+					object.loc.y += playerDirection.y;
+				}
+				state = State.PlayerMoving;
+				animFrames = FRAMES_BETWEEN_TILE_MOVE;
+			}
+		}
+		if (state == State.Free) {
+			var nextLoc = {x: p.loc.x + playerDirection.x, y: p.loc.y + playerDirection.y};
+			if (!currentTile.isInBounds(nextLoc)) {
+				startShift();
+			}
 		}
 	}
 	
 	private function startShift() {
 		state = State.ShiftingTile;
 		animFrames = FRAMES_BETWEEN_TILE_SWITCH;
-		tileCoords.x += direction.x;
-		tileCoords.y += direction.y;
+		tileCoords.x += playerDirection.x;
+		tileCoords.y += playerDirection.y;
 			
-		nextTile = new Tile(TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
+		nextTile = new Tile(p, TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
 		backgroundLayer.add(nextTile);
-		nextTile.x = Main.GAME_WIDTH * direction.x;
-		nextTile.y = Main.GAME_HEIGHT * direction.y;
+		nextTile.x = Main.GAME_WIDTH * playerDirection.x;
+		nextTile.y = Main.GAME_HEIGHT * playerDirection.y;
 		nextTile.changeAllSquares(292, 23);
 	}
 	
@@ -179,19 +201,19 @@ class AbstractPlayState extends FlxTransitionableState {
 		
 		if (state == State.Free) {
 			if (_up && !_down) {
-				direction = {x: 0, y: -1};
+				playerDirection = {x: 0, y: -1};
 				startPlayerMove();
 			}
 			if (!_up && _down) {
-				direction = {x: 0, y: 1};
+				playerDirection = {x: 0, y: 1};
 				startPlayerMove();
 			}
 			if (_left && !_right) {
-				direction = {x: -1, y: 0};
+				playerDirection = {x: -1, y: 0};
 				startPlayerMove();
 			}
 			if (!_left && _right) {
-				direction = {x: 1, y: 0};
+				playerDirection = {x: 1, y: 0};
 				startPlayerMove();
 			}
 			if (FlxG.keys.anyJustPressed([Z]) && state == State.Free) {
@@ -211,15 +233,10 @@ class AbstractPlayState extends FlxTransitionableState {
 			}
 			if (animFrames == 0) {
 				for (i in 0...animatingObjects.length) {
-					var newLoc:Object = {x: animatingObjects[i].localX + animatingDirections[i].x,
-					                     y: animatingObjects[i].localY + animatingDirections[i].y};
-					currentTile.removeObjectsAtLoc(newLoc);
-					
-					animatingObjects[i].localX += animatingDirections[i].x;
-					animatingObjects[i].localY += animatingDirections[i].y;
+					currentTile.removeObjectsAtLocOtherThan(animatingObjects[i]);
 				}
-				if (currentTile.getObjectAtLoc(localTileCoords) != null && currentTile.getObjectAtLoc(localTileCoords).type == "fireball") {
-					currentTile.removeObjectsAtLoc(localTileCoords);
+				if (currentTile.getObjectAtLoc(p.loc) != null && currentTile.getObjectAtLoc(p.loc).type == "fireball") {
+					currentTile.removeObjectsAtLoc(p.loc);
 					killPlayer();
 				}
 				animatingObjects.splice(0, animatingObjects.length);
@@ -239,8 +256,8 @@ class AbstractPlayState extends FlxTransitionableState {
 		moveCount += 1;
 		for (shrineLocation in WorldConstants.shrineLocationMap) {
 			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
-			    localTileCoords.x == shrineLocation.x && localTileCoords.y == shrineLocation.y) {
-				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: localTileCoords.x, y: localTileCoords.y + 1};
+			    p.loc.x == shrineLocation.x && p.loc.y == shrineLocation.y) {
+				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: p.loc.x, y: p.loc.y + 1};
 				FlxG.switchState(new ShrinePlayState(shrineLocation.id));
 				state = State.Locked;
 			}
@@ -255,16 +272,16 @@ class AbstractPlayState extends FlxTransitionableState {
 					worldObject.x += Tile.REAL_TILE_WIDTH * dir.x;
 					worldObject.y += Tile.REAL_TILE_HEIGHT * dir.y;
 					
-					if (localTileCoords.x == worldObject.localX + dir.x && localTileCoords.y == worldObject.localY + dir.y) {
+					if (p.loc.x == worldObject.loc.x + dir.x && p.loc.y == worldObject.loc.y + dir.y) {
 						killPlayer();
 						currentTile.worldObjectsLayer.remove(worldObject);
 						currentTile.worldObjects.splice(i, 1);
-					} else if (!currentTile.isPathableFGOnly({x: worldObject.localX + dir.x, y: worldObject.localY + dir.y})) {
+					} else if (!currentTile.isPathableFGOnly({x: worldObject.loc.x + dir.x, y: worldObject.loc.y + dir.y})) {
 						currentTile.worldObjectsLayer.remove(worldObject);
 						currentTile.worldObjects.splice(i, 1);
 					} else {
-						worldObject.localX += dir.x;
-						worldObject.localY += dir.y;
+						worldObject.loc.x += dir.x;
+						worldObject.loc.y += dir.y;
 					}
 				}
 				--i;
@@ -276,8 +293,8 @@ class AbstractPlayState extends FlxTransitionableState {
 						var dirString = worldObject.params.get("direction");
 						var dir = Utilities.directionToObject(dirString);
 						var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297, dirString), "fireball",
-															 ["x" => Std.string(worldObject.localX + dir.x),
-															  "y" => Std.string(worldObject.localY + dir.y),
+															 ["x" => Std.string(worldObject.loc.x + dir.x),
+															  "y" => Std.string(worldObject.loc.y + dir.y),
 															  "direction" => dirString]);
 						currentTile.addWorldObject(wo);
 					}
@@ -292,8 +309,8 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (state != State.CastingCane) {
 			return;
 		}
-		var nx:Int = localTileCoords.x + direction.x;
-		var ny:Int = localTileCoords.y + direction.y;
+		var nx:Int = p.loc.x + playerDirection.x;
+		var ny:Int = p.loc.y + playerDirection.y;
 		
 		if (currentTile.isPathable({x: nx, y: ny})) {
 			currentTile.removeObjectsOfType("playerCrate");
@@ -328,19 +345,19 @@ class AbstractPlayState extends FlxTransitionableState {
         var _right = FlxG.keys.anyJustPressed([RIGHT, D]);
 		
 		if (_up && !_down) {
-			direction = {x: 0, y: -1};
+			playerDirection = {x: 0, y: -1};
 			castCane();
 		}
 		if (!_up && _down) {
-			direction = {x: 0, y: 1};
+			playerDirection = {x: 0, y: 1};
 			castCane();
 		}
 		if (_left && !_right) {
-			direction = {x: -1, y: 0};
+			playerDirection = {x: -1, y: 0};
 			castCane();
 		}
 		if (!_left && _right) {
-			direction = {x: 1, y: 0};
+			playerDirection = {x: 1, y: 0};
 			castCane();
 		}
 	}
@@ -351,8 +368,8 @@ class AbstractPlayState extends FlxTransitionableState {
 		}
 		--animFrames;
 		
-		var dx = Main.GAME_WIDTH / FRAMES_BETWEEN_TILE_SWITCH * -direction.x;
-		var dy = Main.GAME_HEIGHT / FRAMES_BETWEEN_TILE_SWITCH * -direction.y;
+		var dx = Main.GAME_WIDTH / FRAMES_BETWEEN_TILE_SWITCH * -playerDirection.x;
+		var dy = Main.GAME_HEIGHT / FRAMES_BETWEEN_TILE_SWITCH * -playerDirection.y;
 		currentTile.x += dx;
 		currentTile.y += dy;
 		nextTile.x += dx;
@@ -363,7 +380,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		p.y += dy * (1.0 - Tile.TILE_HEIGHT / FRAMES_BETWEEN_TILE_SWITCH / Main.GAME_HEIGHT);
 		
 		if (animFrames == 0) {
-			currentTile.destroy();
+			//currentTile.destroy();
 			currentTile = nextTile;
 			currentTile.x = 0;
 			currentTile.y = 0;
@@ -374,12 +391,12 @@ class AbstractPlayState extends FlxTransitionableState {
 			}
 			nextTile = null;
 			state = State.Free;
-			localTileCoords.x -= 10 * direction.x;
-			localTileCoords.y -= 10 * direction.y;
-			if (currentTile.getSquare(localTileCoords).fg != 23) {
+			p.loc.x -= 9 * playerDirection.x;
+			p.loc.y -= 9 * playerDirection.y;
+			if (currentTile.getSquare(p.loc).fg != 23) {
 				currentTile.changeAllSquares(23, 292);
 			}
-			respawnTileCoords = Utilities.cloneDirection(localTileCoords);
+			respawnTileCoords = Utilities.cloneDirection(p.loc);
 			snapPlayerToTile();
 		}
 	}
@@ -403,12 +420,12 @@ class AbstractPlayState extends FlxTransitionableState {
 	}
 	
 	public function killPlayer() {
-		localTileCoords = Utilities.cloneDirection(respawnTileCoords);
+		p.loc = Utilities.cloneDirection(respawnTileCoords);
 		snapPlayerToTile();
 	}
 	
 	public function searchForDialog() {
-		var potentialPartner = currentTile.getObjectAtLoc({x: localTileCoords.x + facing.x, y: localTileCoords.y + facing.y});
+		var potentialPartner = currentTile.getObjectAtLoc({x: p.loc.x + facing.x, y: p.loc.y + facing.y});
 		if (potentialPartner == null) {
 			return;
 		}

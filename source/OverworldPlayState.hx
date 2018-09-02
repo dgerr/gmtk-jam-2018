@@ -7,10 +7,10 @@ class OverworldPlayState extends AbstractPlayState {
 		TiledMapManager.get().loadTileSet("world");
 		
 		tileCoords = {x: GameState.get().overworldPosition.tx, y: GameState.get().overworldPosition.ty};
-		localTileCoords = {x: GameState.get().overworldPosition.x, y: GameState.get().overworldPosition.y};
-		respawnTileCoords = Utilities.cloneDirection(localTileCoords);
+		p.loc = {x: GameState.get().overworldPosition.x, y: GameState.get().overworldPosition.y};
+		respawnTileCoords = Utilities.cloneDirection(p.loc);
 		
-		currentTile = new Tile(TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
+		currentTile = new Tile(p, TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
 		
 		backgroundLayer.add(currentTile);
 		snapPlayerToTile();

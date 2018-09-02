@@ -5,13 +5,11 @@ import openfl.Assets;
 import openfl.display.BitmapData;
 import openfl.geom.Matrix;
 
-class Player extends WorldObject {
-	public var spriteData:BitmapData;
-	
-	public function new():Void {
-		super(null, null, null);
+class ShadowPlayer extends WorldObject {
+	public function new(params:Map<String, String>):Void {
+		super(null, "shadow", params);
 		
-		var rawSpriteData = Assets.getBitmapData("assets/images/cat_8.png");
+		var rawSpriteData = Assets.getBitmapData("assets/images/shadow_cat_8.png");
 		
 		var mx:Matrix = new Matrix();
 		mx.scale(Tile.TILE_SCALE, Tile.TILE_SCALE);
