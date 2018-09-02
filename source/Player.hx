@@ -21,10 +21,10 @@ class Player extends WorldObject {
 		_sprite = new FlxSprite();
 		_sprite.loadGraphic(spriteData, true, Tile.TILE_WIDTH * Tile.TILE_SCALE, Tile.TILE_HEIGHT * Tile.TILE_SCALE);
 		
-		_sprite.animation.add("l", [3, 7], 3, false);
-		_sprite.animation.add("r", [2, 6], 3, false);
-		_sprite.animation.add("u", [1, 5], 3, false);
-		_sprite.animation.add("d", [0, 4], 3, false);
+		_sprite.animation.add("l", [3, 12], 3, false);
+		_sprite.animation.add("r", [2, 11], 3, false);
+		_sprite.animation.add("u", [1, 10], 3, false);
+		_sprite.animation.add("d", [0, 9], 3, false);
 		_sprite.animation.add("stand", [0], 1, true);
 		
 		add(_sprite);

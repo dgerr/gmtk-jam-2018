@@ -22,13 +22,16 @@ class SoundManager {
 		
 		soundMap["step"] = AssetPaths.tile__wav;
 		soundMap["gate"] = "assets/sounds/gate.wav";
+		soundMap["mew"] = "assets/sounds/mew.wav";
+		soundMap["stairs"] = "assets/sounds/stairs.wav";
 		soundMap["advance"] = "assets/sounds/advance.wav";
+		soundMap["victory"] = "assets/sounds/victory.wav";
 
 		soundMap["shrine"] = AssetPaths.shrine__wav;
 	}
 	
 	public function stopMusic() {
-		currentMusic = null;
+		FlxG.sound.music.stop();
 	}
 	
 	public function playMusic(musicName:String):Void {

@@ -6,9 +6,11 @@ class GameState {
 	public static var _manager = null;
 	
 	public var shrineProgress:Map<String, Int>;
+	public var shrinesBeaten:Int = 0;
 	
 	public var currentShrine:Int = -1;
 	public var overworldPosition:Object;
+	public var unlockedStaff:Bool = false;
 	
 	public static function get():GameState {
 		if (_manager == null) {

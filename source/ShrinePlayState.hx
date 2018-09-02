@@ -91,8 +91,13 @@ class ShrinePlayState extends AbstractPlayState {
 		}
 		
 		if (tileInfo.fg == 312) {
-			GameState.get().shrineProgress[shrineID] = 100;
+			if (!GameState.get().shrineProgress.exists(shrineID)) {
+				GameState.get().shrineProgress[shrineID] = 100;
+				GameState.get().shrinesBeaten += 1;
+			}
 			state = State.Locked;
+			SoundManager.get().stopMusic();
+			SoundManager.get().playSound("victory");
 			FlxG.switchState(new OverworldPlayState());
 		}
 
