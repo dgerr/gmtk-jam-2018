@@ -21,6 +21,6 @@ class GameState {
 		shrineProgress = new Map<String, Int>();
 		
 		//overworldPosition = {tx: 1, ty: 1, x: 4, y: 4};
-		overworldPosition = {tx: 4, ty: 4, x: 7, y: 7};
+		overworldPosition = {tx: 6, ty: 1, x: 3, y: 3};
 	}
 }

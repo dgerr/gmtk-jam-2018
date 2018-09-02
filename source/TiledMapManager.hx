@@ -14,6 +14,7 @@ import sys.io.File;
 class TiledMapManager {
 	public var tiledLayer1:Array<Array<Int>>;
 	public var tiledLayer2:Array<Array<Int>>;
+	public var tiledLayer3:Array<Array<Int>>;
 	public var path:String = null;
 	
 	public var params:Array<Map<String, String>>;
@@ -47,27 +48,35 @@ class TiledMapManager {
 		this.path = path;
 		tiledLayer1 = new Array<Array<Int>>();
 		tiledLayer2 = new Array<Array<Int>>();
+		tiledLayer3 = new Array<Array<Int>>();
 		params = new Array<Map<String, String>>();
 		
 		var fin = File.read("assets/data/" + path + "_background.csv");
 		var fin2 = File.read("assets/data/" + path + "_foreground.csv");
+		var fin3 = File.read("assets/data/" + path + "_foreground2.csv");
 		
 		try {
 			while (true) {
 				var line = fin.readLine().split(",");
 				var line2 = fin2.readLine().split(",");
+				var line3 = fin3.readLine().split(",");
 				
 				var build1 = [];
 				var build2 = [];
+				var build3 = [];
 				for (i in line) {
 					build1.push(Std.parseInt(i));
 				}
 				for (i in line2) {
 					build2.push(Std.parseInt(i));
 				}
+				for (i in line3) {
+					build3.push(Std.parseInt(i));
+				}
 				
 				tiledLayer1.push(build1);
 				tiledLayer2.push(build2);
+				tiledLayer3.push(build3);
 			}
 		} catch (e:Eof) { }
 		
@@ -114,6 +123,20 @@ class TiledMapManager {
 		return returnBitmapData;
 	}
 	
+	public function generateBitmapDataFromFrames(values:Array<Int>):BitmapData {
+		var bitmapData:BitmapData = new BitmapData(Tile.TILE_WIDTH * values.length, Tile.TILE_HEIGHT, true, 0);
+		for (i in 0...values.length) {
+			bitmapData.copyPixels(tileBitmapData, getRectangleOfValue(values[i]), new Point(Tile.TILE_WIDTH * i, 0));
+		}
+		
+		var returnBitmapData:BitmapData = new BitmapData(Tile.REAL_TILE_WIDTH * values.length, Tile.REAL_TILE_HEIGHT, true, 0);
+		var mx:Matrix = new Matrix();
+		mx.scale(Tile.TILE_SCALE, Tile.TILE_SCALE);
+		returnBitmapData.draw(bitmapData, mx);
+		
+		return returnBitmapData;
+	}
+	
 	public function getTileObject(x:Int, y:Int):Object {
 		if (path == null) {
 			trace("Must load a tileset first!");
@@ -121,6 +144,7 @@ class TiledMapManager {
 		}
 		var builtArray:Array<Array<Int>> = new Array<Array<Int>>();
 		var builtArray2:Array<Array<Int>> = new Array<Array<Int>>();
+		var builtArray3:Array<Array<Int>> = new Array<Array<Int>>();
 		var builtParamsArray:Array<Array<Map<String, String>>> = new Array<Array<Map<String, String>>>();
 		
 		var sx = 11 * x;
@@ -129,6 +153,7 @@ class TiledMapManager {
 		for (i in 0...10) {
 			builtArray.push(tiledLayer1[sy + i].slice(sx, sx + 10));
 			builtArray2.push(tiledLayer2[sy + i].slice(sx, sx + 10));
+			builtArray3.push(tiledLayer3[sy + i].slice(sx, sx + 10));
 		}
 		for (i in 0...10) {
 			builtParamsArray.push(new Array<Map<String, String>>());
@@ -141,7 +166,7 @@ class TiledMapManager {
 				}
 			}
 		}
-		return {bg: builtArray, fg: builtArray2, params: builtParamsArray};
+		return {bg: builtArray, fg: builtArray2, fg2: builtArray3, params: builtParamsArray};
 	}
 	
 	public function hasTileObjectAt(x:Int, y:Int):Bool {

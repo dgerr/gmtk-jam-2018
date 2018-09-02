@@ -34,7 +34,8 @@ class ShrinePlayState extends AbstractPlayState {
 		if (tileInfo.bg == 289) {
 			currentTile.setSquare(localTileCoords, 290);
 		} else if (tileInfo.bg == 290) {
-			currentTile.setSquare(localTileCoords, 314);
+			currentTile.changeAllSquares(289, 314);
+			currentTile.changeAllSquares(290, 314);
 		}
 		if (currentTile.getNumTiles(289) > 0 || currentTile.getNumTiles(314) > 0) {
 			passedChecks = false;
@@ -47,6 +48,19 @@ class ShrinePlayState extends AbstractPlayState {
 					if (currentTile.tileObject.fg[i][j] == 294 && (currentTile.isPathable({x: j, y: i}) && (localTileCoords.x != j || localTileCoords.y != i))) {
 						passedChecks = false;
 						break;
+					}
+				}
+			}
+		}
+		
+		// spawn shadow clones
+		if (tileInfo.fg == 318) {
+			currentTile.removeObjectsOfType("shadow");
+			for (i in 0...currentTile.tileObject.bg.length) {
+				for (j in 0...currentTile.tileObject.bg[i].length) {
+					if (currentTile.tileObject.bg[i][j] == 319 && currentTile.isPathable({x: j, y: i})) {
+						//var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(319
+						//currentTile.addWorldObject(
 					}
 				}
 			}
