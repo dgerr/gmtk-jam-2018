@@ -21,7 +21,8 @@ class WorldConstants {
 		 "shrine4" => {tx_start: 1, ty_start: 2, x_start: 5, y_start: 9},
 		 "shrine5" => {tx_start: 0, ty_start: 1, x_start: 5, y_start: 9},
 		 "shrine6" => {tx_start: 1, ty_start: 2, x_start: 4, y_start: 9},
-		 "shrine7" => {tx_start: 0, ty_start: 1, x_start: 3, y_start: 9}];
+		 "shrine7" => {tx_start: 0, ty_start: 1, x_start: 3, y_start: 9},
+		 "shrine8" => {tx_start: 0, ty_start: 1, x_start: 5, y_start: 9}];
 	
 	public static var tileAnimationFrames:Map<Int, Array<Int>> =
 		[
@@ -72,5 +73,5 @@ class WorldConstants {
 	
 	public static var shrinesWithPermanentGates:Array<String> = ["shrine5"];
 	
-	public static var START_LOCATION:Object = {tx: 3, ty: 3, x: 4, y: 4};
+	public static var START_LOCATION:Object = {tx: 5, ty: 5, x: 4, y: 6};
 }

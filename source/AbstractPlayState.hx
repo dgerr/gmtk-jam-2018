@@ -102,18 +102,19 @@ class AbstractPlayState extends FlxTransitionableState {
 		var nextLoc = {x: wo.loc.x + direction.x, y: wo.loc.y + direction.y};
 		
 		if (direction.x == -1) {
-			wo._sprite.animation.play("l");
+			if (wo.type != "zombie") wo._sprite.animation.play("l");
 			facing = {x: -1, y: 0};
 		} else if (direction.x == 1) {
-			wo._sprite.animation.play("r");
+			if (wo.type != "zombie") wo._sprite.animation.play("r");
 			facing = {x: 1, y: 0};
 		} else if (direction.y == 1) {
-			wo._sprite.animation.play("d");
+			if (wo.type != "zombie") wo._sprite.animation.play("d");
 			facing = {x: 0, y: 1};
 		} else {
-			wo._sprite.animation.play("u");
+			if (wo.type != "zombie") wo._sprite.animation.play("u");
 			facing = {x: 0, y: -1};
 		}
+		
 		if (currentTile.isInBounds(nextLoc)) {
 			var tileObject = currentTile.getSquare(nextLoc);
 			if (!currentTile.isTerrainPathable(nextLoc)) {
@@ -166,30 +167,6 @@ class AbstractPlayState extends FlxTransitionableState {
 				animFrames = FRAMES_BETWEEN_TILE_MOVE;
 			}
 		}
-		
-		var sortedZombies = new Array<WorldObject>();
-		for (obj in currentTile.worldObjects) {
-			if (obj.type == "zombie") {
-				sortedZombies.push(obj);
-			}
-		}
-		
-		/*for (zombie in sortedZombies) {
-			var dx = p.loc.x - zombie.loc.x;
-			var dy = p.loc.y - zombie.loc.y;
-			
-			var sdx = (dx < 0 ? -1 : (dx > 0 ? 1 : 0));
-			var sdy = (dy < 0 ? -1 : (dy > 0 ? 1 : 0));
-			
-			var tryX = {x: zombie.loc.x + sdx, y: zombie.loc.y};
-			var tryY = {x: zombie.loc.x, y: zombie.loc.y + sdy};
-			
-			var pathableX = isPathable(tryX);
-			var pathableY = isPathable(tryY);
-			
-			if (Math.abs(dx) > Math.abs(dy) && pathableX) {
-			}
-		}*/
 		
 		if (state == State.Free) {
 			var nextLoc = {x: p.loc.x + playerDirection.x, y: p.loc.y + playerDirection.y};
@@ -270,11 +247,86 @@ class AbstractPlayState extends FlxTransitionableState {
 				startResolveMove();
 			}
 		}
+		if (state == State.EnemyMoving) {
+			--animFrames;
+			var amtToMove = Std.int(Tile.TILE_WIDTH * Tile.TILE_SCALE / FRAMES_BETWEEN_TILE_MOVE);
+			
+			for (i in 0...animatingObjects.length) {
+				animatingObjects[i].x += animatingDirections[i].x * amtToMove;
+				animatingObjects[i].y += animatingDirections[i].y * amtToMove;
+			}
+			if (animFrames == 0) {
+				for (i in 0...animatingObjects.length) {
+					if (animatingObjects[i].type == "zombie" && Math.abs(p.loc.x - animatingObjects[i].loc.x) + Math.abs(p.loc.y - animatingObjects[i].loc.y) <= 1) {
+						var p:Particle = new Particle("particles/heart.png", animatingObjects[i].x + Tile.REAL_TILE_WIDTH / 2 - 20, animatingObjects[i].y - 15, 1,
+													  function(p) { p.y -= (0.6 - 0.024 * p.frameNumber); p.alpha -= 0.02; });
+						particleLayer.add(p);
+					}
+					currentTile.removeObjectsAtLocOtherThan(animatingObjects[i]);
+				}
+				animatingObjects.splice(0, animatingObjects.length);
+				animatingDirections.splice(0, animatingDirections.length);
+				state = State.Free;
+			}
+		}
 	}
 	
 	public function startResolveMove() {
 		if (state != State.StartResolving) {
 			return;
+		}
+		
+		var sortedZombies = new Array<WorldObject>();
+		for (obj in currentTile.worldObjects) {
+			if (obj.type == "zombie") {
+				sortedZombies.push(obj);
+			}
+		}
+		
+		for (zombie in sortedZombies) {
+			var dx = p.loc.x - zombie.loc.x;
+			var dy = p.loc.y - zombie.loc.y;
+			
+			var sdx = (dx < 0 ? -1 : (dx > 0 ? 1 : 0));
+			var sdy = (dy < 0 ? -1 : (dy > 0 ? 1 : 0));
+			
+			var tryX = {x: sdx, y: 0};
+			var tryY = {x: 0, y: sdy};
+			
+			var moveX = tryObjectMove(zombie, tryX);
+			var moveY = tryObjectMove(zombie, tryY);
+			
+			var moveStrategy = "none";
+			if (Math.abs(dx) > Math.abs(dy) && moveX.length > 0) {
+				moveStrategy = "x";
+			} else if (Math.abs(dy) > Math.abs(dx) && moveY.length > 0) {
+				moveStrategy = "y";
+			} else if (moveX.length > 0) {
+				moveStrategy = "x";
+			} else if (moveY.length > 0) {
+				moveStrategy = "y";
+			}
+			if (moveStrategy == "x") {
+				for (object in moveX) {
+					animatingObjects.push(object);
+					animatingDirections.push(Utilities.cloneDirection(tryX));
+					object.loc.x += sdx;
+				}
+				state = State.EnemyMoving;
+				animFrames = FRAMES_BETWEEN_TILE_MOVE;
+			} else if (moveStrategy == "y") {
+				for (object in moveY) {
+					animatingObjects.push(object);
+					animatingDirections.push(Utilities.cloneDirection(tryY));
+					object.loc.y += sdy;
+				}
+				state = State.EnemyMoving;
+				animFrames = FRAMES_BETWEEN_TILE_MOVE;
+			} else {
+				var p:Particle = new Particle("particles/heart.png", zombie.x + Tile.REAL_TILE_WIDTH / 2 - 20, zombie.y - 15, 1,
+													  function(p) { p.y -= (0.6 - 0.024 * p.frameNumber); p.alpha -= 0.02; });
+				particleLayer.add(p);
+			}
 		}
 		
 		var i = currentTile.worldObjects.length - 1;
@@ -314,7 +366,9 @@ class AbstractPlayState extends FlxTransitionableState {
 			}
 		}
 		
-		state = State.Free;
+		if (state != State.EnemyMoving) {
+			state = State.Free;
+		}
 	}
 	
 	public function castCane() {
@@ -460,7 +514,6 @@ class AbstractPlayState extends FlxTransitionableState {
 		super.update(elapsed);
 		
 		handleMovement();
-		startResolveMove();
 		resolveCast();
 		shiftTile();
 		

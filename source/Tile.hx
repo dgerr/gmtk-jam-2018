@@ -30,6 +30,7 @@ class Tile extends FlxSpriteGroup {
 	public var playerRef:Player;
 	public var worldObjects:Array<WorldObject>;
 	public var worldObjectsLayer:FlxSpriteGroup;
+	public var topObjectsLayer:FlxSpriteGroup;
 	
 	public function new(playerRef:Player, tileObject:Object):Void {
 		super();
@@ -41,6 +42,7 @@ class Tile extends FlxSpriteGroup {
 		this.tileObject = tileObject;
 		worldObjects = new Array<WorldObject>();
 		worldObjectsLayer = new FlxSpriteGroup();
+		topObjectsLayer = new FlxSpriteGroup();
 		
 		var srcBitmapData:BitmapData = TiledMapManager.get().tileBitmapData;
 		
@@ -124,6 +126,7 @@ class Tile extends FlxSpriteGroup {
 		add(fgS);
 		
 		add(worldObjectsLayer);
+		add(topObjectsLayer);
 	}
 	
 	public function getSquare(loc:Object):Object {
@@ -273,7 +276,11 @@ class Tile extends FlxSpriteGroup {
 	
 	public function addWorldObject(worldObject:WorldObject) {
 		worldObjects.push(worldObject);
-		worldObjectsLayer.add(worldObject);
+		if (worldObject.type != "zombie") {
+			worldObjectsLayer.add(worldObject);
+		} else {
+			topObjectsLayer.add(worldObject);
+		}
 		worldObject.x = REAL_TILE_WIDTH * worldObject.loc.x;
 		worldObject.y = REAL_TILE_HEIGHT * worldObject.loc.y;
 	}

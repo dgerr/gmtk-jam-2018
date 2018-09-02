@@ -8,6 +8,7 @@ import openfl.utils.Object;
 class Particle extends FlxSprite {
 	private var duration:Float;
 	private var fn:Particle -> Void = null;
+	public var frameNumber:Int = 0;
 	
     public function new(path:String, ?X:Float = 0, ?Y:Float = 0, ?duration:Float, ?fn:Particle -> Void,
 	                    ?animationInfo:Object = null) {
@@ -32,6 +33,7 @@ class Particle extends FlxSprite {
     }
 	public override function update(elapsed:Float):Void {
 		this.duration -= elapsed;
+		++frameNumber;
 		if (this.duration <= 0) {
 			this.destroy();
 		} else {
