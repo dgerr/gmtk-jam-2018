@@ -19,6 +19,8 @@ class DialogBox extends FlxSpriteGroup {
 	public var callback:Void -> Void = null;
 	public var abortCallback:Void -> Void = null;
 	
+	public var options:FlxSprite;
+	
 	public function new(messages:Array<String>, callback:Void -> Void, ?abortCallback:Void -> Void = null) {
 		super();
 		
@@ -29,6 +31,9 @@ class DialogBox extends FlxSpriteGroup {
 		var bitmapData:BitmapData = Assets.getBitmapData("assets/images/dialogbox.png");
 		bgSprite = new FlxSprite();
 		bgSprite.loadGraphic(Utilities.scaleBitmapData(bitmapData, Tile.TILE_SCALE, Tile.TILE_SCALE));
+		
+		options = new FlxSprite();
+		options.loadGraphic(Utilities.scaleBitmapData(Assets.getBitmapData("assets/images/dialogbox_options.png", Tile.TILE_SCALE, Tile.TILE_SCALE)), true, 30, 30);
 		
 		this.add(bgSprite);
 		

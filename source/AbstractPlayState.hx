@@ -41,6 +41,7 @@ class AbstractPlayState extends FlxTransitionableState {
 	
 	public var FRAMES_BETWEEN_TILE_MOVE:Int = 4;
 	public var FRAMES_BETWEEN_TILE_SWITCH:Int = 15;
+	public var FRAMES_TO_LOCK_MOVEMENT:Int = 9;
 	
 	public var tileCoords:Object;
 	public var respawnTileCoords:Object;
@@ -48,6 +49,7 @@ class AbstractPlayState extends FlxTransitionableState {
 	public var currentTile:Tile;
 	public var nextTile:Tile;
 	public var frameCount:Int = 0;
+	public var lockMoveFrameCount:Int = 0;
 	public var moveCount:Int = 0;
 	
 	public var showingDialogBox:Bool = false;
@@ -164,6 +166,7 @@ class AbstractPlayState extends FlxTransitionableState {
 					object.loc.y += playerDirection.y;
 				}
 				state = State.PlayerMoving;
+				lockMoveFrameCount = FRAMES_TO_LOCK_MOVEMENT;
 				animFrames = FRAMES_BETWEEN_TILE_MOVE;
 			}
 		}
@@ -189,10 +192,10 @@ class AbstractPlayState extends FlxTransitionableState {
 	}
 	
 	public function handleMovement():Void {
-		var _up = FlxG.keys.anyJustPressed([UP, W]);
-        var _down = FlxG.keys.anyJustPressed([DOWN, S]);
-        var _left = FlxG.keys.anyJustPressed([LEFT, A]);
-        var _right = FlxG.keys.anyJustPressed([RIGHT, D]);
+		var _up = FlxG.keys.anyJustPressed([UP, W]) || (lockMoveFrameCount == 0 && FlxG.keys.anyPressed([UP, W]));
+        var _down = FlxG.keys.anyJustPressed([DOWN, S]) || (lockMoveFrameCount == 0 && FlxG.keys.anyPressed([DOWN, S]));
+        var _left = FlxG.keys.anyJustPressed([LEFT, A]) || (lockMoveFrameCount == 0 && FlxG.keys.anyPressed([LEFT, A]));
+        var _right = FlxG.keys.anyJustPressed([RIGHT, D]) || (lockMoveFrameCount == 0 && FlxG.keys.anyPressed([RIGHT, D]));
 		
 		if (showingDialogBox) {
 			dialogBox.handleInput();
@@ -454,5 +457,8 @@ class AbstractPlayState extends FlxTransitionableState {
 		
 		spawnParticleEffects();
 		++frameCount;
+		if (lockMoveFrameCount > 0) {
+			--lockMoveFrameCount;
+		}
 	}
 }

@@ -22,7 +22,6 @@ class WorldObject extends FlxSpriteGroup {
 			loc = {x: Std.parseInt(params["x"]), y: Std.parseInt(params["y"])};
 		}
 		_sprite = new FlxSprite();
-		
 		if (bitmapData != null) {
 			if (animationFrames <= 0) {
 				_sprite.loadGraphic(bitmapData);
@@ -32,7 +31,7 @@ class WorldObject extends FlxSpriteGroup {
 					animation.push(i);
 				}
 				_sprite.loadGraphic(bitmapData, true, Std.int(bitmapData.width / animationFrames), bitmapData.height);
-				_sprite.animation.add("normal", animation, 4, true);
+				_sprite.animation.add("normal", animation, ((type != null && WorldConstants.tileAnimationFPS.exists(type)) ? WorldConstants.tileAnimationFPS[type] : 4), true);
 				_sprite.animation.play("normal");
 			}
 			
@@ -41,7 +40,7 @@ class WorldObject extends FlxSpriteGroup {
 	}
 	
 	public static function isSolid(worldObject:WorldObject) {
-		if (worldObject.type == "fireball") return false;
+		if (worldObject.type == "fireball" || worldObject.type == "grass") return false;
 		
 		return true;
 	}
