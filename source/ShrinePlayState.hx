@@ -21,6 +21,8 @@ class ShrinePlayState extends AbstractPlayState {
 		
 		backgroundLayer.add(currentTile);
 		snapPlayerToTile();
+		
+		SoundManager.get().playMusic("shrine");
 	}
 	
 	public override function startResolveMove() {
