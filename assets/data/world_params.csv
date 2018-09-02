@@ -42,7 +42,7 @@
 
 // 3,2
 {"tx":3, "ty":2, "x":1, "y":7, "type":"normal", "text":"Orange glasses are the best! You agree with me, right? | I knew it!"}
-{"tx":0, "ty":2, "x":8, "y":2, "type":"normal", "text":"Bro...... orange glasses are lame. | Purple? Totally different story, dude. | Meow."}
+{"tx":3, "ty":2, "x":8, "y":2, "type":"normal", "text":"Bro...... orange glasses are lame. | Purple? Totally different story, dude. | Meow."}
 
 
 // 4,2
@@ -58,11 +58,11 @@
 {"tx":0, "ty":3, "x":8, "y":3, "type":"normal", "text":"I used to live here when I was alive.  | But I'm a ghost meow! | ...boo!! | ... | ...not very scary, I guess... "}
 
 // 1,3
-{"tx":0, "ty":3, "x":2, "y":6, "type":"normal", "text":"Play with us! Play with us!"}
-{"tx":0, "ty":3, "x":3, "y":6, "type":"normal", "text":"We usually play with the ghost up the street, but she's too good at hide-and-seek..."}
+{"tx":1, "ty":3, "x":2, "y":6, "type":"normal", "text":"Play with us! Play with us!"}
+{"tx":1, "ty":3, "x":3, "y":6, "type":"normal", "text":"We usually play with the ghost up the street, but she's too good at hide-and-seek..."}
 
 // 2,3
-{"tx":0, "ty":3, "x":5, "y":3, "type":"normal", "text":"I like to get away from the town and nap under the trees.|Zzz..."}
+{"tx":2, "ty":3, "x":5, "y":3, "type":"normal", "text":"I like to get away from the town and nap under the trees.|Zzz..."}
 
 // 3,3
 
