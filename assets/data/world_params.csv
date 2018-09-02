@@ -69,6 +69,14 @@
 {"tx":3, "ty":3, "x":4, "y":6, "type":"normal", "text":"Meow meow meeeow! | (Help us, traveller!)"}
 {"tx":3, "ty":3, "x":6, "y":4, "type":"elder"}
 
+// these coordinates are all the cat statue
+{"tx":3, "ty":3, "x":4, "y":1, "type":"normal", "text":"The statue looks at you mysteriously.|Something is missing...|You think that, if you find the treasures of the eight shrines, the curse may be lifted."}
+{"tx":3, "ty":3, "x":4, "y":2, "type":"normal", "text":"The statue looks at you mysteriously.|Something is missing...|You think that, if you find the treasures of the eight shrines, the curse may be lifted."}
+{"tx":3, "ty":3, "x":4, "y":3, "type":"normal", "text":"The statue looks at you mysteriously.|Something is missing...|You think that, if you find the treasures of the eight shrines, the curse may be lifted."}
+{"tx":3, "ty":3, "x":5, "y":1, "type":"normal", "text":"The statue looks at you mysteriously.|Something is missing...|You think that, if you find the treasures of the eight shrines, the curse may be lifted."}
+{"tx":3, "ty":3, "x":5, "y":2, "type":"normal", "text":"The statue looks at you mysteriously.|Something is missing...|You think that, if you find the treasures of the eight shrines, the curse may be lifted."}
+{"tx":3, "ty":3, "x":5, "y":3, "type":"normal", "text":"The statue looks at you mysteriously.|Something is missing...|You think that, if you find the treasures of the eight shrines, the curse may be lifted."}
+
 // 4,3
 
 // 5,3
