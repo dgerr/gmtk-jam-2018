@@ -28,6 +28,9 @@ class DialogBox extends FlxSpriteGroup {
 		super();
 		
 		this.messages = messages;
+		for (i in 0...this.messages.length) {
+			this.messages[i] = StringTools.trim(this.messages[i]);
+		}
 		this.callback = callback;
 		this.abortCallback = abortCallback;
 		
