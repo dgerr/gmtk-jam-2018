@@ -87,14 +87,6 @@ class ShrinePlayState extends AbstractPlayState {
 			FlxG.switchState(new OverworldPlayState());
 		}
 
-		for (shrineLocation in WorldConstants.shrineLocationMap) {
-			if (tileCoords.x == shrineLocation.tx && tileCoords.y == shrineLocation.ty &&
-			    p.loc.x == shrineLocation.x && p.loc.y == shrineLocation.y) {
-				GameState.get().overworldPosition = {tx: tileCoords.x, ty: tileCoords.y, x: p.loc.x, y: p.loc.y + 1};
-				FlxG.switchState(new ShrinePlayState(shrineLocation.id));
-				state = State.Locked;
-			}
-		}
 		if (state == State.StartResolving) {
 			state = State.Free;
 		}
