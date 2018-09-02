@@ -54,6 +54,7 @@ class DialogBox extends FlxSpriteGroup {
 		text = new FlxText(TEXT_PADDING_X, TEXT_PADDING_Y, Main.GAME_WIDTH - 2 * TEXT_PADDING_X, messages[0], 16);
 		text.setFormat(null, 16, FlxColor.BLACK);
 		this.add(text);
+		SoundManager.get().playSound("advance");
 	}
 	
 	public function handleInput() {
@@ -67,6 +68,7 @@ class DialogBox extends FlxSpriteGroup {
 				text = new FlxText(TEXT_PADDING_X, TEXT_PADDING_Y, Main.GAME_WIDTH - 2 * TEXT_PADDING_X, messages[index], 16);
 				text.setFormat(null, 16, FlxColor.BLACK);
 				this.add(text);
+				SoundManager.get().playSound("advance");
 				
 				if (index == messages.length - 1) {
 					options.animation.play("finish");

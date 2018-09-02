@@ -7,9 +7,6 @@ import haxe.io.Eof;
 import openfl.Assets;
 import openfl.geom.Rectangle;
 import openfl.utils.Object;
-import sys.FileStat;
-import sys.FileSystem;
-import sys.io.File;
 
 class TiledMapManager {
 	public var tiledLayer1:Array<Array<Int>>;
@@ -37,9 +34,8 @@ class TiledMapManager {
 		
 		collisionMap = new Map<Int, Bool>();
 		
-		var fin = File.read("assets/data/solid_tiles.csv");
-		var line = fin.readLine().split(",");
-		for (i in line) {
+		var fin = Constants.constantsMap["solid_tiles.csv"][0].split(",");
+		for (i in fin) {
 			collisionMap[Std.parseInt(i)] = true;
 		}
 	}
@@ -51,19 +47,18 @@ class TiledMapManager {
 		tiledLayer3 = null;
 		params = new Array<Map<String, String>>();
 		
-		var fin = File.read("assets/data/" + path + "_background.csv");
-		var fin2 = File.read("assets/data/" + path + "_foreground.csv");
+		var fin = Constants.constantsMap[path + "_background.csv"];
+		var fin2 = Constants.constantsMap[path + "_foreground.csv"];
 		var fin3 = null;
-		if (FileSystem.exists("assets/data/" + path + "_foreground2.csv")) {
+		if (Constants.constantsMap.exists(path + "_foreground2.csv")) {
 			tiledLayer3 = new Array<Array<Int>>();
-			fin3 = File.read("assets/data/" + path + "_foreground2.csv");
+			fin3 = Constants.constantsMap[path + "_foreground2.csv"];
 		}
 		
 		try {
-			while (true) {
-				var line = fin.readLine().split(",");
-				var line2 = fin2.readLine().split(",");
-				
+			for (i in 0...fin.length) {
+				var line = fin[i].split(",");
+				var line2 = fin2[i].split(",");
 				var build1 = [];
 				var build2 = [];
 				for (i in line) {
@@ -73,8 +68,8 @@ class TiledMapManager {
 					build2.push(Std.parseInt(i));
 				}
 				
-				if (tiledLayer3 != null) {
-					var line3 = fin3.readLine().split(",");
+				if (fin3 != null) {
+					var line3 = fin3[i].split(",");
 					var build3 = [];
 					for (i in line3) {
 						build3.push(Std.parseInt(i));
@@ -86,13 +81,12 @@ class TiledMapManager {
 				tiledLayer2.push(build2);
 			}
 		} catch (e:Eof) { }
-		
-		var params_path = "assets/data/" + path + "_params.csv";
-		if (FileSystem.exists(params_path)) {
-			var params_fin = File.read(params_path);
+
+		var params_path = path + "_params.csv";
+		if (Constants.constantsMap.exists(params_path)) {
+			var params_fin = Constants.constantsMap[params_path];
 			try {
-				while (true) {
-					var line:String = params_fin.readLine();
+				for (line in params_fin) {
 					if (StringTools.trim(line) == "") {
 						continue;
 					}
@@ -183,7 +177,7 @@ class TiledMapManager {
 	public function hasTileObjectAt(x:Int, y:Int):Bool {
 		if (path == null) {
 			trace("Must load a tileset first!");
-			return null;
+			return false;
 		}
 		
 		var sx = 11 * x + (path == "world" ? 2 : 0);

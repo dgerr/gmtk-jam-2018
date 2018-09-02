@@ -68,10 +68,10 @@ class WorldConstants {
 		  336 => "cat", 337 => "cat", 338 => "cat", 360 => "cat", 361 => "cat", 362 => "cat",
 		  339 => "cat", 340 => "cat", 341 => "cat", 342 => "cat", 343 => "cat", 344 => "cat",
 		  345 => "cat", 346 => "cat", 347 => "cat", 348 => "cat", 363 => "cat", 364 => "cat",
-		  626 => "cat", 627 => "cat", 628 => "cat", 672 => "cat", 673 => "cat", 674 => "cat",
-		  675 => "cat", 676 => "cat"];
+		  626 => "catStatue", 627 => "catStatue", 628 => "catStatue", 672 => "catStatue",
+		  673 => "catStatue", 674 => "catStatue", 675 => "catStatue", 676 => "catStatue"];
 	
 	public static var shrinesWithPermanentGates:Array<String> = ["shrine5"];
 	
-	public static var START_LOCATION:Object = {tx: 5, ty: 5, x: 4, y: 6};
+	public static var START_LOCATION:Object = {tx: 3, ty: 1, x: 4, y: 4};
 }

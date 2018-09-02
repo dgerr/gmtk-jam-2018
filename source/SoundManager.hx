@@ -6,9 +6,9 @@ import flixel.system.FlxSound;
 class SoundManager {
 	public static var _manager:SoundManager = null;
 	
-	public static var currentMusic:FlxSound = null;
+	public static var currentMusic:String = null;
 	
-	public static var soundMap:Map<String, FlxSound>;
+	public static var soundMap:Map<String, String>;
 	
 	public static function get():SoundManager {
 		if (_manager == null) {
@@ -18,29 +18,23 @@ class SoundManager {
 	}
 	
 	public function new() {
-		soundMap = new Map<String, FlxSound>();
+		soundMap = new Map<String, String>();
 		
-		soundMap["step"] = FlxG.sound.load(AssetPaths.tile__wav);
+		soundMap["step"] = AssetPaths.tile__wav;
+		soundMap["gate"] = "assets/sounds/gate.wav";
+		soundMap["advance"] = "assets/sounds/advance.wav";
 
-		soundMap["shrine"] = FlxG.sound.load(AssetPaths.shrine__wav);
+		soundMap["shrine"] = AssetPaths.shrine__wav;
 	}
 	
 	public function stopMusic() {
-		currentMusic.stop();
 		currentMusic = null;
 	}
 	
 	public function playMusic(musicName:String):Void {
-		if (currentMusic != null) {
-			currentMusic.stop();
-		}
-		if (!soundMap.exists(musicName)) {
-			trace("No music with key " + musicName);
-			return;
-		}
-		trace("playing" + soundMap[musicName]);
-		currentMusic = soundMap[musicName];
-		currentMusic.play();
+		var volume:Float = 1.0;
+		if (musicName == "shrine") volume = 0.3;
+		FlxG.sound.playMusic(soundMap[musicName], volume);
 	}
 
 	public function playSound(soundName:String):Void {
@@ -48,6 +42,8 @@ class SoundManager {
 			trace("No sound with key " + soundName);
 			return;
 		}
-		soundMap[soundName].play();
+		var volume:Float = 1.0;
+		if (soundName == "advance") volume = 0.15;
+		FlxG.sound.load(soundMap[soundName], 0.15).play();
 	}
 }

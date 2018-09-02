@@ -78,8 +78,14 @@ class ShrinePlayState extends AbstractPlayState {
 		if (!savePassedChecks || WorldConstants.shrinesWithPermanentGates.indexOf(shrineID) == -1) {
 			if (passedChecks) {
 				savePassedChecks = true;
+				if (currentTile.getNumTiles(292) > 0) {
+					SoundManager.get().playSound("gate");
+				}
 				currentTile.changeAllSquares(292, 23);
 			} else {
+				if (currentTile.getNumTiles(23) > 0) {
+					SoundManager.get().playSound("gate");
+				}
 				currentTile.changeAllSquares(23, 292);
 			}
 		}

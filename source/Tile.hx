@@ -74,7 +74,7 @@ class Tile extends FlxSpriteGroup {
 					var woAnimationFrames:Int = 0;
 					if (source[i][j] == 339 || source[i][j] == 363) {
 						// zombie cat
-						var zombieCat:ZombieCat = new ZombieCat(["x" => Std.string(j), "y" => Std.string(i)]);
+						var zombieCat:ZombieCat = new ZombieCat(["x" => Std.string(j), "y" => Std.string(i), "ox" => Std.string(j), "oy" => Std.string(i)]);
 						addWorldObject(zombieCat);
 						source[i][j] = -1;
 						continue;
