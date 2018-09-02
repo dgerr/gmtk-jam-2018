@@ -26,6 +26,7 @@ class SoundManager {
 		soundMap["victory"] = "assets/sounds/victory.wav";
 
 		soundMap["shrine"] = AssetPaths.shrine__wav;
+		soundMap["overworld"] = "assets/music/overworld_generic.wav";
 	}
 	
 	public function stopMusic() {

@@ -50,6 +50,8 @@ class OverworldPlayState extends AbstractPlayState {
 									 "...But we can't thank you enough!!!",
 									 "You're welcome here anytime, meow!"]);
 		}
+		
+		SoundManager.get().playMusic("overworld");
 	}
 	
 	public override function startResolveMove() {
