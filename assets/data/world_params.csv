@@ -104,7 +104,7 @@
 
 // 1,5
 {"tx":1, "ty":5, "x":2, "y":3, "type":"normal", "text":"I'm not the mayor, but I look like him, or so they tell me."}
-{"tx":1, "ty":5, "x":5, "y":8, "type":"normal", "text":"What are you looking at, punk? | ... | ... Sorry! Sorry! I just wanted to sound cool."}
+{"tx":1, "ty":5, "x":5, "y":8, "type":"guard"}
 
 // 2,5
 {"tx":2, "ty":5, "x":2, "y":5, "type":"normal", "text":"This place is enchanted... can you feel it?"}

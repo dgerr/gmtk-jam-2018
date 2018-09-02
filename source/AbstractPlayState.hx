@@ -587,6 +587,13 @@ class AbstractPlayState extends FlxTransitionableState {
 				return ["Ah, you look like you're doing well!", "Looking for another shrine? Try wandering to the northwest."];
 			}
 			return ["Unfortunately, I'm an old cat. I haven't the energy to explore the world anymore. You'll need to find the other shrines on your own."];
+		} else if (type == "guard") {
+			if (!GameState.get().unlockedStaff) {
+				return ["What are you looking at, punk?", "...", "... Sorry! Sorry! I just wanted to sound cool.",
+				        "But seriously, this place is off limits. Come back when you can cast a magic spell."];
+			} else {
+				return ["Think you're hot stuff now? Just 'cause the Elder taught you a new move?", "Well, you are! I believe in you <3"];
+			}
 		}
 		trace("Unknown type " + type);
 		return ["..."];

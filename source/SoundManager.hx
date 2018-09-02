@@ -1,8 +1,6 @@
 package;
 import flixel.FlxG;
 
-import flixel.system.FlxSound;
-
 class SoundManager {
 	public static var _manager:SoundManager = null;
 	

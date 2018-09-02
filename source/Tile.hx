@@ -94,6 +94,12 @@ class Tile extends FlxSpriteGroup {
 					}
 
 					if (isWorldObject) {
+						if (tileObject.params[i][j].exists("type") && tileObject.params[i][j].get("type") == "guard") {
+							if (GameState.get().unlockedStaff) {
+								tileObject.params[i][j].set("x", "4");
+								tileObject.params[i][j].set("y", "7");
+							}
+						}
 						var worldObject:WorldObject = new WorldObject(woBitmapData, WorldConstants.specialTileTypes[source[i][j]], tileObject.params[i][j], woAnimationFrames);
 						addWorldObject(worldObject);
 						source[i][j] = -1;

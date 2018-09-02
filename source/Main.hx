@@ -12,6 +12,6 @@ class Main extends Sprite {
 		
 		Constants.loadMap();
 		
-		addChild(new FlxGame(0, 0, OverworldPlayState, 1, 60, 60, true));
+		addChild(new FlxGame(0, 0, SplashScreenState, 1, 60, 60, true));
 	}
 }
