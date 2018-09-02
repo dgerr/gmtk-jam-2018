@@ -184,6 +184,8 @@ class AbstractPlayState extends FlxTransitionableState {
 			if (!currentTile.isInBounds(nextLoc)) {
 				startShift();
 			}
+		} else {
+			++moveCount;
 		}
 	}
 	
@@ -310,7 +312,6 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (state != State.StartResolving) {
 			return;
 		}
-		++moveCount;
 		
 		var sortedZombies = new Array<WorldObject>();
 		for (obj in currentTile.worldObjects) {
@@ -428,6 +429,7 @@ class AbstractPlayState extends FlxTransitionableState {
 											  function(v) { v.y -= 0.5; v.alpha -= 0.1; });
 				particleLayer.add(p);
 			}
+			++moveCount;
 			state = State.StartResolving;
 			startResolveMove();
 		}
