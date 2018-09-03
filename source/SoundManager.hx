@@ -36,7 +36,7 @@ class SoundManager {
 	
 	public function playMusic(musicName:String):Void {
 		var volume:Float = 1.0;
-		volume = 0.3;
+		volume = 0.6;
 		if (musicName == "shrine") volume = 0.15;
 		FlxG.sound.playMusic(soundMap[musicName], volume);
 	}
