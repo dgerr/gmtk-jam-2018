@@ -47,7 +47,7 @@ class WorldConstants {
 			336 => [336, 360],  // glasses
 			337 => [337, 361],  // scary red
 			338 => [338, 362],  // small pink
-			339 => [339, 363],  // zombie
+			363 => [339, 363],  // zombie
 			340 => [340, 364],  // ghost
 			341 => [341, 365],  // farmer
 			342 => [342, 366],  // elder

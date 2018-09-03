@@ -35,6 +35,19 @@ class ShrinePlayState extends AbstractPlayState {
 		var tileInfo = currentTile.getSquare(p.loc);
 		var passedChecks = true;
 		
+		for (obj in currentTile.worldObjects) {
+			if (obj.type == "zombie" || obj.type == "shadow") {
+				var objTileInfo = currentTile.getSquare(obj.loc);
+				
+				if (objTileInfo.bg == 289) {
+					currentTile.setSquare(obj.loc, 290);
+				} else if (objTileInfo.bg == 290) {
+					currentTile.changeAllSquares(289, 314);
+					currentTile.changeAllSquares(290, 314);
+				}
+			}
+		}
+		
 		// check red squares
 		if (tileInfo.bg == 289) {
 			currentTile.setSquare(p.loc, 290);
@@ -104,7 +117,7 @@ class ShrinePlayState extends AbstractPlayState {
 			if (GameState.get().shrinesBeaten == 8 && !GameState.get().seenEndCutscene) {
 				GameState.get().overworldPosition = {tx: 3, ty: 3, x: 5, y: 4};
 			}
-			new FlxTimer().start(6, function(t:FlxTimer) { FlxG.switchState(new OverworldPlayState()); }, 1);
+			new FlxTimer().start(7, function(t:FlxTimer) { FlxG.switchState(new OverworldPlayState()); }, 1);
 		}
 
 		if (state == State.StartResolving) {

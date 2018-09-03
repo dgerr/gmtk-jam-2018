@@ -313,56 +313,54 @@ class AbstractPlayState extends FlxTransitionableState {
 			return;
 		}
 		
-		var sortedZombies = new Array<WorldObject>();
-		for (obj in currentTile.worldObjects) {
-			if (obj.type == "zombie") {
-				sortedZombies.push(obj);
-			}
-		}
-		
-		for (zombie in sortedZombies) {
-			var dx = p.loc.x - zombie.loc.x;
-			var dy = p.loc.y - zombie.loc.y;
-			
-			var sdx = (dx < 0 ? -1 : (dx > 0 ? 1 : 0));
-			var sdy = (dy < 0 ? -1 : (dy > 0 ? 1 : 0));
-			
-			var tryX = {x: sdx, y: 0};
-			var tryY = {x: 0, y: sdy};
-			
-			var moveX = tryObjectMove(zombie, tryX);
-			var moveY = tryObjectMove(zombie, tryY);
-			
-			var moveStrategy = "none";
-			if (Math.abs(dx) > Math.abs(dy) && moveX.length > 0) {
-				moveStrategy = "x";
-			} else if (Math.abs(dy) > Math.abs(dx) && moveY.length > 0) {
-				moveStrategy = "y";
-			} else if (moveX.length > 0) {
-				moveStrategy = "x";
-			} else if (moveY.length > 0) {
-				moveStrategy = "y";
-			}
-			if (moveStrategy == "x") {
-				for (object in moveX) {
-					animatingObjects.push(object);
-					animatingDirections.push(Utilities.cloneDirection(tryX));
-					object.loc.x += sdx;
+		if (moveCount % 2 == 0) {
+			var sortedZombies = new Array<WorldObject>();
+			for (obj in currentTile.worldObjects) {
+				if (obj.type == "zombie") {
+					sortedZombies.push(obj);
 				}
-				state = State.EnemyMoving;
-				animFrames = FRAMES_BETWEEN_TILE_MOVE;
-			} else if (moveStrategy == "y") {
-				for (object in moveY) {
-					animatingObjects.push(object);
-					animatingDirections.push(Utilities.cloneDirection(tryY));
-					object.loc.y += sdy;
+			}
+			
+			for (zombie in sortedZombies) {
+				var dx = p.loc.x - zombie.loc.x;
+				var dy = p.loc.y - zombie.loc.y;
+				
+				var sdx = (dx < 0 ? -1 : (dx > 0 ? 1 : 0));
+				var sdy = (dy < 0 ? -1 : (dy > 0 ? 1 : 0));
+				
+				var tryX = {x: sdx, y: 0};
+				var tryY = {x: 0, y: sdy};
+				
+				var moveX = tryObjectMove(zombie, tryX);
+				var moveY = tryObjectMove(zombie, tryY);
+				
+				var moveStrategy = "none";
+				if (Math.abs(dx) > Math.abs(dy) && moveX.length > 0) {
+					moveStrategy = "x";
+				} else if (Math.abs(dy) > Math.abs(dx) && moveY.length > 0) {
+					moveStrategy = "y";
+				} else if (moveX.length > 0) {
+					moveStrategy = "x";
+				} else if (moveY.length > 0) {
+					moveStrategy = "y";
 				}
-				state = State.EnemyMoving;
-				animFrames = FRAMES_BETWEEN_TILE_MOVE;
-			} else {
-				var p:Particle = new Particle("particles/heart.png", zombie.x + Tile.REAL_TILE_WIDTH / 2 - 20, zombie.y - 15, 1,
-													  function(p) { p.y -= (0.6 - 0.024 * p.frameNumber); p.alpha -= 0.02; });
-				particleLayer.add(p);
+				if (moveStrategy == "x") {
+					for (object in moveX) {
+						animatingObjects.push(object);
+						animatingDirections.push(Utilities.cloneDirection(tryX));
+						object.loc.x += sdx;
+					}
+					state = State.EnemyMoving;
+					animFrames = FRAMES_BETWEEN_TILE_MOVE;
+				} else if (moveStrategy == "y") {
+					for (object in moveY) {
+						animatingObjects.push(object);
+						animatingDirections.push(Utilities.cloneDirection(tryY));
+						object.loc.y += sdy;
+					}
+					state = State.EnemyMoving;
+					animFrames = FRAMES_BETWEEN_TILE_MOVE;
+				}
 			}
 		}
 		
@@ -582,7 +580,7 @@ class AbstractPlayState extends FlxTransitionableState {
 						"I wish you luck on your adventure. Now that you can summon boxes, seek out the shrine in our village to the southwest!"];
 			}
 			if (!GameState.get().shrineProgress.exists("shrine1")) {
-				return ["Please, adventurer! Help us rescue the 8 guardian cat spirits!", "I think I saw a shrine to the east. Try wandering that way."];
+				return ["Please, adventurer! Help us rescue the eight guardian cat spirits!", "I think I saw a shrine to the east. Try wandering that way."];
 			} else if (!GameState.get().shrineProgress.exists("shrine3")) {
 				return ["Good to see you again!", "Looking for another shrine? Try wandering to the north."];
 			} else if (!GameState.get().shrineProgress.exists("shrine2")) {

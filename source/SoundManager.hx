@@ -27,7 +27,7 @@ class SoundManager {
 		soundMap["puff"] = "assets/sounds/puff.wav";
 
 		soundMap["shrine"] = AssetPaths.shrine__wav;
-		soundMap["overworld"] = "assets/music/overworld_generic.wav";
+		soundMap["overworld"] = "assets/music/silly_song4.mp3";
 	}
 	
 	public function stopMusic() {
@@ -37,6 +37,7 @@ class SoundManager {
 	public function playMusic(musicName:String):Void {
 		var volume:Float = 1.0;
 		volume = 0.3;
+		if (musicName == "shrine") volume = 0.15;
 		FlxG.sound.playMusic(soundMap[musicName], volume);
 	}
 
@@ -46,7 +47,8 @@ class SoundManager {
 			return;
 		}
 		var volume:Float = 1.0;
-		if (soundName == "advance") volume = 0.15;
-		FlxG.sound.load(soundMap[soundName], 0.15).play();
+		if (soundName == "puff") volume = 0.15;
+		if (soundName == "advance") volume = 0.3;
+		FlxG.sound.load(soundMap[soundName], volume).play();
 	}
 }

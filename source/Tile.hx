@@ -31,6 +31,9 @@ class Tile extends FlxSpriteGroup {
 	public var worldObjects:Array<WorldObject>;
 	public var worldObjectsLayer:FlxSpriteGroup;
 	public var topObjectsLayer:FlxSpriteGroup;
+		
+	public var bgS:FlxSprite;
+	public var fgS:FlxSprite;
 	
 	public function new(playerRef:Player, tileObject:Object):Void {
 		super();
@@ -72,7 +75,7 @@ class Tile extends FlxSpriteGroup {
 					var isWorldObject = false;
 					var woBitmapData:BitmapData = null;
 					var woAnimationFrames:Int = 0;
-					if (source[i][j] == 339 || source[i][j] == 363) {
+					if (source[i][j] == 339) {
 						// zombie cat
 						var zombieCat:ZombieCat = new ZombieCat(["x" => Std.string(j), "y" => Std.string(i), "ox" => Std.string(j), "oy" => Std.string(i)]);
 						addWorldObject(zombieCat);
@@ -123,11 +126,11 @@ class Tile extends FlxSpriteGroup {
 		bgDisplayData.draw(blit, mx);
 		fgDisplayData.draw(blit2, mx);
 		
-		var bgS = new FlxSprite();
+		bgS = new FlxSprite();
 		bgS.loadGraphic(bgDisplayData);
 		add(bgS);
 		
-		var fgS = new FlxSprite();
+		fgS = new FlxSprite();
 		fgS.loadGraphic(fgDisplayData);
 		add(fgS);
 		
@@ -181,8 +184,11 @@ class Tile extends FlxSpriteGroup {
 		
 		if (layer == "bg") {
 			bgDisplayData.draw(blit, mx);
+			bgS.loadGraphic(bgDisplayData);
+			
 		} else if (layer == "fg") {
 			fgDisplayData.draw(blit, mx);
+			fgS.loadGraphic(fgDisplayData);
 		}
 	}
 	
