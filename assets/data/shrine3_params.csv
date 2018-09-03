@@ -1,10 +1,8 @@
-{"tx":0, "ty":2, "x": 3, "y": 6, "type":"normal", "text":"Welcome, meow...|Fireballs are too hot for small kittens. They move after you do, meow."}
+{"tx":0, "ty":2, "x": 3, "y": 6, "type":"normal", "text":"Welcome, meow...|Fireballs are too hot for small kittens. They move after you do, meow.|Press 'R' to start over if you get into trouble..."}
 {"tx":0,"ty":2,"x":7,"y":0,"direction":"south","frequency":4,"offset":0}
 {"tx":0,"ty":2,"x":0,"y":3,"direction":"east","frequency":3,"offset":0}
 {"tx":0,"ty":1,"x":0,"y":3,"direction":"east","frequency":3,"offset":0}
 {"tx":0,"ty":1,"x":0,"y":4,"direction":"east","frequency":3,"offset":1}
 {"tx":0,"ty":0,"x":1,"y":0,"direction":"south","frequency":6,"offset":0}
 {"tx":0,"ty":0,"x":2,"y":0,"direction":"south","frequency":6,"offset":2}
-{"tx":0,"ty":0,"x":6,"y":9,"direction":"north","frequency":8,"offset":1}
-{"tx":0,"ty":0,"x":7,"y":9,"direction":"north","frequency":8,"offset":5}
-
+{"tx":0,"ty":0,"x":8,"y":6,"direction":"north","frequency":5,"offset":1}

@@ -97,6 +97,10 @@ class Tile extends FlxSpriteGroup {
 					}
 
 					if (isWorldObject) {
+						if (WorldConstants.specialTileTypes[source[i][j]] == "crate") {
+							tileObject.params[i][j].set("ox", Std.string(j));
+							tileObject.params[i][j].set("oy", Std.string(i));
+						}
 						if (tileObject.params[i][j].exists("type") && tileObject.params[i][j].get("type") == "guard") {
 							if (GameState.get().unlockedStaff) {
 								tileObject.params[i][j].set("x", "4");
@@ -216,21 +220,38 @@ class Tile extends FlxSpriteGroup {
 	}
 	
 	public function removeObjectsAtLoc(loc:Object) {
-		for (worldObject in worldObjects) {
+		var i = 0;
+		while (i < worldObjects.length) {
+			var worldObject = worldObjects[i];
 			if (worldObject.loc.x == loc.x && worldObject.loc.y == loc.y) {
 				worldObjectsLayer.remove(worldObject);
-				worldObjects.remove(worldObject);
+				worldObjects.splice(i, 1);
+				--i;
 			}
+			++i;
 		}
 	}
 	
 	public function removeObjectsAtLocOtherThan(wo:WorldObject) {
-		for (worldObject in worldObjects) {
-			if (worldObject != wo && worldObject.loc.x == wo.x && worldObject.loc.y == wo.y) {
+		var i = 0;
+		while (i < worldObjects.length) {
+			var worldObject = worldObjects[i];
+			if (worldObject != wo && worldObject.loc.x == wo.loc.x && worldObject.loc.y == wo.loc.y) {
 				worldObjectsLayer.remove(worldObject);
-				worldObjects.remove(worldObject);
+				worldObjects.splice(i, 1);
+				--i;
+			}
+			++i;
+		}
+	}
+	
+	public function isFireballAtLoc(loc:Object) {
+		for (worldObject in worldObjects) {
+			if (worldObject.type == "fireball" && worldObject.loc.x == loc.x && worldObject.loc.y == loc.y) {
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	public function removeObjectsOfType(type:String) {
@@ -260,8 +281,13 @@ class Tile extends FlxSpriteGroup {
 			return false;
 		}
 		var squareObj = getSquare(loc);
-		if (TiledMapManager.get().isSolid(squareObj.fg) || (squareObj.fg2 != null && TiledMapManager.get().isSolid(squareObj.fg2)) || (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
+		if (TiledMapManager.get().isSolid(squareObj.fg) || (squareObj.fg2 != null && TiledMapManager.get().isSolid(squareObj.fg2))) {
 			return false;
+		}
+		for (i in worldObjects) {
+			if (i.loc.x == loc.x && i.loc.y == loc.y && WorldObject.isSolid(i)) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -271,8 +297,13 @@ class Tile extends FlxSpriteGroup {
 			return false;
 		}
 		var squareObj = getSquare(loc);
-		if (!isTerrainPathable(loc) || (squareObj.object != null && WorldObject.isSolid(squareObj.object))) {
+		if (!isTerrainPathable(loc)) {
 			return false;
+		}
+		for (i in worldObjects) {
+			if (i.loc.x == loc.x && i.loc.y == loc.y && WorldObject.isSolid(i)) {
+				return false;
+			}
 		}
 		return true;
 	}

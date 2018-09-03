@@ -75,5 +75,5 @@ class WorldConstants {
 	
 	public static var shrinesWithPermanentGates:Array<String> = ["shrine5"];
 	
-	public static var START_LOCATION:Object = {tx: 3, ty: 3, x: 5, y: 4};
+	public static var START_LOCATION:Object = {tx: 1, ty: 0, x: 2, y: 6};
 }

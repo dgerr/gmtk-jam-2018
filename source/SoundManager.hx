@@ -18,15 +18,15 @@ class SoundManager {
 	public function new() {
 		soundMap = new Map<String, String>();
 		
-		soundMap["step"] = AssetPaths.tile__wav;
-		soundMap["gate"] = "assets/sounds/gate.wav";
-		soundMap["mew"] = "assets/sounds/mew.wav";
-		soundMap["stairs"] = "assets/sounds/stairs.wav";
-		soundMap["advance"] = "assets/sounds/advance.wav";
-		soundMap["victory"] = "assets/sounds/victory.wav";
-		soundMap["puff"] = "assets/sounds/puff.wav";
+		soundMap["step"] = "assets/sounds/step.mp3";
+		soundMap["gate"] = "assets/sounds/gate.mp3";
+		soundMap["mew"] = "assets/sounds/mew.mp3";
+		soundMap["stairs"] = "assets/sounds/stairs.mp3";
+		soundMap["advance"] = "assets/sounds/advance.mp3";
+		soundMap["victory"] = "assets/sounds/victory.mp3";
+		soundMap["puff"] = "assets/sounds/puff.mp3";
 
-		soundMap["shrine"] = AssetPaths.shrine__wav;
+		soundMap["shrine"] = "assets/music/shrine.mp3";
 		soundMap["overworld"] = "assets/music/silly_song4.mp3";
 	}
 	

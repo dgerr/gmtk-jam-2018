@@ -253,7 +253,13 @@ class AbstractPlayState extends FlxTransitionableState {
 			}
 			if (animFrames == 0) {
 				for (i in 0...animatingObjects.length) {
-					currentTile.removeObjectsAtLocOtherThan(animatingObjects[i]);
+					if (animatingObjects[i].type != "player") {
+						if (currentTile.isFireballAtLoc(animatingObjects[i].loc) && animatingObjects[i].type == "shadow") {
+							currentTile.removeObjectsAtLoc(animatingObjects[i].loc);
+						} else {
+							currentTile.removeObjectsAtLocOtherThan(animatingObjects[i]);
+						}
+					}
 				}
 				if (currentTile.getObjectAtLoc(p.loc) != null && currentTile.getObjectAtLoc(p.loc).type == "fireball") {
 					currentTile.removeObjectsAtLoc(p.loc);
@@ -283,6 +289,16 @@ class AbstractPlayState extends FlxTransitionableState {
 													  function(p) { p.y -= (0.6 - 0.024 * p.frameNumber); p.alpha -= 0.02; });
 						particleLayer.add(p);
 					} else if (wo.type == "fireball") {
+						for (otherObject in currentTile.worldObjects) {
+							if ((otherObject.type == "shadow") && otherObject.loc.x == wo.loc.x && otherObject.loc.y == wo.loc.y) {
+								currentTile.worldObjectsLayer.remove(otherObject);
+								currentTile.worldObjects.remove(otherObject);
+								currentTile.worldObjectsLayer.remove(wo);
+								currentTile.worldObjects.remove(wo);
+								animatingObjects.splice(i, 1);
+								animatingDirections.splice(i, 1);
+							}
+						}
 						if (p.loc.x == wo.loc.x && p.loc.y == wo.loc.y) {
 							killPlayer();
 							currentTile.worldObjectsLayer.remove(wo);
@@ -298,7 +314,9 @@ class AbstractPlayState extends FlxTransitionableState {
 							--i;
 						}
 					}
-					currentTile.removeObjectsAtLocOtherThan(animatingObjects[i]);
+					if (wo.type != "fireball") {
+						currentTile.removeObjectsAtLocOtherThan(wo);
+					}
 					++i;
 				}
 				animatingObjects.splice(0, animatingObjects.length);
@@ -409,6 +427,7 @@ class AbstractPlayState extends FlxTransitionableState {
 			return;
 		}
 		if (!GameState.get().unlockedStaff) {
+			state = State.Free;
 			return;
 		}
 		var nx:Int = p.loc.x + playerDirection.x;
@@ -546,13 +565,15 @@ class AbstractPlayState extends FlxTransitionableState {
 	
 	public function killPlayer() {
 		for (object in currentTile.worldObjects) {
-			if (object.type == "zombie") {
+			if (object.type == "zombie" || object.type == "crate") {
 				object.loc.x = Std.parseInt(object.params["ox"]);
 				object.loc.y = Std.parseInt(object.params["oy"]);
 				object.x = Tile.REAL_TILE_WIDTH * object.loc.x;
 				object.y = Tile.REAL_TILE_HEIGHT * object.loc.y;
 			}
 		}
+		currentTile.removeObjectsOfType("shadow");
+		shadows.splice(0, shadows.length);
 		p.loc = Utilities.cloneDirection(respawnTileCoords);
 		snapPlayerToTile();
 	}
