@@ -8,6 +8,9 @@ import openfl.geom.Matrix;
 class Player extends WorldObject {
 	public var spriteData:BitmapData;
 	
+	public var keyIndicator:FlxSprite;
+	public var keyIndicatorAttached:Bool = false;
+	
 	public function new():Void {
 		super(null, "player", null);
 		
@@ -15,6 +18,15 @@ class Player extends WorldObject {
 		
 		var mx:Matrix = new Matrix();
 		mx.scale(Tile.TILE_SCALE, Tile.TILE_SCALE);
+		
+		keyIndicator = new FlxSprite();
+		keyIndicator.loadGraphic(Utilities.scaleBitmapData(Assets.getBitmapData("assets/images/key_indicators.png"), 3, 3), true, 30, 30);
+		keyIndicator.animation.add("z", [0], 1, true);
+		keyIndicator.animation.add("r", [1], 1, true);
+		keyIndicator.animation.play("r");
+		
+		keyIndicator.x = Tile.REAL_TILE_WIDTH / 2 - 15;
+		keyIndicator.y = -35;
 
 		var spriteData:BitmapData = new BitmapData(rawSpriteData.width * Tile.TILE_SCALE, rawSpriteData.height * Tile.TILE_SCALE, true, 0x000000);
 		spriteData.draw(rawSpriteData, mx);
@@ -29,6 +41,20 @@ class Player extends WorldObject {
 		_sprite.animation.add("stand", [0], 4, true);
 		
 		add(_sprite);
+	}
+	
+	public function addKeyIndicator() {
+		if (!keyIndicatorAttached) {
+			add(keyIndicator);
+		}
+		keyIndicatorAttached = true;
+	}
+	
+	public function removeKeyIndicator() {
+		if (keyIndicatorAttached) {
+			remove(keyIndicator);
+		}
+		keyIndicatorAttached = false;
 	}
 
 	override public function update(elapsed:Float):Void {

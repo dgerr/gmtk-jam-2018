@@ -54,6 +54,7 @@ class AbstractPlayState extends FlxTransitionableState {
 	public var dialogBox:DialogBox = null;
 	
 	public var animatingObjects:Array<WorldObject>;
+	public var animatedObjects:Array<WorldObject>;
 	public var animatingDirections:Array<Object>;
 	
 	public var keyIndicator:FlxSprite;
@@ -73,6 +74,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		add(interfaceLayer);
 		
 		animatingObjects = new Array<WorldObject>();
+		animatedObjects = new Array<WorldObject>();
 		animatingDirections = new Array<Object>();
 		
 		p = new Player();
@@ -265,11 +267,13 @@ class AbstractPlayState extends FlxTransitionableState {
 					currentTile.removeObjectsAtLoc(p.loc);
 					killPlayer();
 				}
+				animatedObjects = animatingObjects.slice(0, animatingObjects.length);
 				animatingObjects.splice(0, animatingObjects.length);
 				animatingDirections.splice(0, animatingDirections.length);
 				state = State.StartResolving;
 				snapPlayerToTile();
 				startResolveMove();
+				animatedObjects = animatedObjects.splice(0, animatedObjects.length);
 			}
 		}
 		if (state == State.EnemyMoving) {
@@ -408,11 +412,14 @@ class AbstractPlayState extends FlxTransitionableState {
 				if ((moveCount + Std.parseInt(worldObject.params.get("offset"))) % Std.parseInt(worldObject.params.get("frequency")) == 0) {
 					var dirString = worldObject.params.get("direction");
 					var dir = Utilities.directionToObject(dirString);
-					var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297, dirString), "fireball",
-														 ["x" => Std.string(worldObject.loc.x + dir.x),
-														  "y" => Std.string(worldObject.loc.y + dir.y),
-														  "direction" => dirString]);
-					currentTile.addWorldObject(wo);
+					var newLoc = {x: worldObject.loc.x + dir.x, y: worldObject.loc.y + dir.y};
+					if (currentTile.isPathableFGOnly(newLoc)) {
+						var wo:WorldObject = new WorldObject(TiledMapManager.get().getTileBitmapData(297, dirString), "fireball",
+															 ["x" => Std.string(worldObject.loc.x + dir.x),
+															  "y" => Std.string(worldObject.loc.y + dir.y),
+															  "direction" => dirString]);
+						currentTile.addWorldObject(wo);
+					}
 				}
 			}
 		}
@@ -574,6 +581,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		}
 		currentTile.removeObjectsOfType("shadow");
 		shadows.splice(0, shadows.length);
+		p.removeKeyIndicator();
 		p.loc = Utilities.cloneDirection(respawnTileCoords);
 		snapPlayerToTile();
 	}

@@ -36,7 +36,7 @@ class ShrinePlayState extends AbstractPlayState {
 		var passedChecks = true;
 		
 		for (obj in currentTile.worldObjects) {
-			if (obj.type == "zombie" || obj.type == "shadow") {
+			if ((obj.type == "zombie" || obj.type == "shadow") && (animatedObjects != null && animatedObjects.indexOf(obj) != -1)) {
 				var objTileInfo = currentTile.getSquare(obj.loc);
 				
 				if (objTileInfo.bg == 289) {
@@ -56,8 +56,16 @@ class ShrinePlayState extends AbstractPlayState {
 			currentTile.changeAllSquares(289, 314);
 			currentTile.changeAllSquares(290, 314);
 		}
+		if (currentTile.getNumTiles(289) == 0 && currentTile.getNumTiles(314) == 0) {
+			currentTile.changeAllSquares(290, 324);
+		}
 		if (currentTile.getNumTiles(289) > 0 || currentTile.getNumTiles(314) > 0) {
 			passedChecks = false;
+			if (currentTile.getNumTiles(314) > 0) {
+				p.addKeyIndicator();
+			} else {
+				p.removeKeyIndicator();
+			}
 		}
 		
 		// check switches
@@ -131,6 +139,7 @@ class ShrinePlayState extends AbstractPlayState {
 		currentTile.removeObjectsOfType("shadow");
 		currentTile.changeAllSquares(290, 289);
 		currentTile.changeAllSquares(314, 289);
+		currentTile.changeAllSquares(324, 289);
 	}
 
 	private override function startShift() {

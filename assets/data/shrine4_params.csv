@@ -1,4 +1,4 @@
-{"tx":1, "ty":2, "x": 6, "y": 3, "type":"normal", "text":"Welcome, meow...|To conquer this dungeon, you'll need to bring a friend..."}
+{"tx":1, "ty":2, "x": 6, "y": 3, "type":"normal", "text":"Welcome, meow...|To conquer this dungeon, you'll need to make use of your new power..."}
 {"tx":0,"ty":0,"x":1,"y":1,"direction":"east","frequency":4,"offset":0}
 {"tx":1,"ty":0,"x":0,"y":4,"direction":"east","frequency":4,"offset":0}
 {"tx":1,"ty":0,"x":2,"y":0,"direction":"south","frequency":4,"offset":1}
