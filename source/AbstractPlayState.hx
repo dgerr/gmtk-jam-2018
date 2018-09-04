@@ -41,7 +41,6 @@ class AbstractPlayState extends FlxTransitionableState {
 	public var FRAMES_BETWEEN_TILE_SWITCH:Int = 15;
 	public var FRAMES_TO_LOCK_MOVEMENT:Int = 9;
 	
-	public var tileCoords:Object;
 	public var respawnTileCoords:Object;
 	
 	public var currentTile:Tile;
@@ -92,17 +91,22 @@ class AbstractPlayState extends FlxTransitionableState {
 		
 		FlxTransitionableState.defaultTransIn = new TransitionData();
 		FlxTransitionableState.defaultTransOut = new TransitionData();
-		
+
 		var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
 		diamond.persist = true;
 		diamond.destroyOnNoUse = false;
 		
 		FlxTransitionableState.defaultTransIn.color = FlxColor.BLACK;
 		FlxTransitionableState.defaultTransOut.color = FlxColor.BLACK;
+		#if html5
+		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.FADE;
+		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.FADE;
+		#else
 		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.TILES;
 		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.TILES;
 		FlxTransitionableState.defaultTransIn.tileData = { asset: diamond, width: 32, height: 32 };
 		FlxTransitionableState.defaultTransOut.tileData = { asset: diamond, width: 32, height: 32 };
+		#end
 		transOut = FlxTransitionableState.defaultTransOut;
 	}
 	
@@ -194,10 +198,10 @@ class AbstractPlayState extends FlxTransitionableState {
 	private function startShift() {
 		state = State.ShiftingTile;
 		animFrames = FRAMES_BETWEEN_TILE_SWITCH;
-		tileCoords.x += playerDirection.x;
-		tileCoords.y += playerDirection.y;
+		p.tileCoords.x += playerDirection.x;
+		p.tileCoords.y += playerDirection.y;
 			
-		nextTile = new Tile(p, TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
+		nextTile = new Tile(p, TiledMapManager.get().getTileObject(p.tileCoords.x, p.tileCoords.y));
 		backgroundLayer.add(nextTile);
 		nextTile.x = Main.GAME_WIDTH * playerDirection.x;
 		nextTile.y = Main.GAME_HEIGHT * playerDirection.y;
@@ -215,6 +219,11 @@ class AbstractPlayState extends FlxTransitionableState {
 			return;
 		}
 		
+		if (FlxG.keys.anyJustPressed([Z]) && (state == State.Free || state == State.CastingCane)) {
+			state = State.Free;
+			searchForDialog();
+		}
+
 		if (state == State.Free) {
 			if (_up && !_down) {
 				playerDirection = {x: 0, y: -1};
@@ -232,13 +241,10 @@ class AbstractPlayState extends FlxTransitionableState {
 				playerDirection = {x: 1, y: 0};
 				startPlayerMove();
 			}
-			if (FlxG.keys.anyJustPressed([R]) && state == State.Free) {
+			if (FlxG.keys.anyJustPressed([R]) && (state == State.Free || state == State.CastingCane)) {
 				killPlayer();
 			}
-			if (FlxG.keys.anyJustPressed([Z]) && state == State.Free) {
-				searchForDialog();
-			}
-			if (FlxG.keys.anyJustPressed([X]) && state == State.Free) {
+			if (FlxG.keys.anyJustPressed([X]) && GameState.get().unlockedStaff && state == State.Free) {
 				state = State.CastingCane;
 			}
 		}
@@ -257,6 +263,7 @@ class AbstractPlayState extends FlxTransitionableState {
 				for (i in 0...animatingObjects.length) {
 					if (animatingObjects[i].type != "player") {
 						if (currentTile.isFireballAtLoc(animatingObjects[i].loc) && animatingObjects[i].type == "shadow") {
+							shadows.remove(cast(animatingObjects[i], ShadowPlayer));
 							currentTile.removeObjectsAtLoc(animatingObjects[i].loc);
 						} else {
 							currentTile.removeObjectsAtLocOtherThan(animatingObjects[i]);
@@ -299,6 +306,7 @@ class AbstractPlayState extends FlxTransitionableState {
 								currentTile.worldObjects.remove(otherObject);
 								currentTile.worldObjectsLayer.remove(wo);
 								currentTile.worldObjects.remove(wo);
+								shadows.remove(cast(otherObject, ShadowPlayer));
 								animatingObjects.splice(i, 1);
 								animatingDirections.splice(i, 1);
 							}
@@ -419,6 +427,26 @@ class AbstractPlayState extends FlxTransitionableState {
 															  "y" => Std.string(worldObject.loc.y + dir.y),
 															  "direction" => dirString]);
 						currentTile.addWorldObject(wo);
+						
+						for (otherObject in currentTile.worldObjects) {
+							if ((otherObject.type == "shadow") && otherObject.loc.x == wo.loc.x && otherObject.loc.y == wo.loc.y) {
+								currentTile.worldObjectsLayer.remove(otherObject);
+								currentTile.worldObjects.remove(otherObject);
+								currentTile.worldObjectsLayer.remove(wo);
+								currentTile.worldObjects.remove(wo);
+								shadows.remove(cast(otherObject, ShadowPlayer));
+								animatingObjects.splice(i, 1);
+								animatingDirections.splice(i, 1);
+							}
+						}
+						if (p.loc.x == wo.loc.x && p.loc.y == wo.loc.y) {
+							killPlayer();
+							currentTile.worldObjectsLayer.remove(wo);
+							currentTile.worldObjects.remove(wo);
+							animatingObjects.splice(i, 1);
+							animatingDirections.splice(i, 1);
+							--i;
+						}
 					}
 				}
 			}
@@ -489,6 +517,9 @@ class AbstractPlayState extends FlxTransitionableState {
 			playerDirection = {x: 1, y: 0};
 			castCane();
 		}
+		if (state == State.CastingCane) {
+			state = State.Free;
+		}
 	}
 	
 	public function shiftTile() {
@@ -519,6 +550,7 @@ class AbstractPlayState extends FlxTransitionableState {
 				particle.destroy();
 			}
 			nextTile = null;
+			shadows.splice(0, shadows.length);
 			givePlayerControl();
 			p.loc.x -= 9 * playerDirection.x;
 			p.loc.y -= 9 * playerDirection.y;
@@ -556,7 +588,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (frameCount % 2 == 0) {
 			for (row in 0...currentTile.tileObject.bg.length) {
 				for (col in 0...currentTile.tileObject.bg[row].length) {
-					/*if (currentTile.tileObject.fg[row][col] == 380) {
+					if (currentTile.tileObject.fg[row][col] == 380) {
 						var p:Particle = new Particle("particles/sparkle.png",
 													  col * Tile.REAL_TILE_WIDTH + 0.1 * Tile.REAL_TILE_WIDTH + 0.8 * Std.random(Tile.REAL_TILE_WIDTH + 1),
 													  row * Tile.REAL_TILE_HEIGHT + 0.1 * Tile.REAL_TILE_HEIGHT + 0.9 * Std.random(Tile.REAL_TILE_HEIGHT + 1),
@@ -564,7 +596,7 @@ class AbstractPlayState extends FlxTransitionableState {
 													  function(v) { v.y -= 0.3; v.alpha -= 0.05; },
 													  {rows: 1, cols: 4, animation: [0, 1, 2, 3]});
 						particleLayer.add(p);
-					}*/
+					}
 				}
 			}
 		}
@@ -583,6 +615,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		shadows.splice(0, shadows.length);
 		p.removeKeyIndicator();
 		p.loc = Utilities.cloneDirection(respawnTileCoords);
+		state = State.Free;
 		snapPlayerToTile();
 	}
 	

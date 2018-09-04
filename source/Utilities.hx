@@ -30,4 +30,11 @@ class Utilities {
 	public static function cloneDirection(dir:Object) {
 		return {x: dir.x, y: dir.y};
 	}
+	
+	public static function parseInt(i:String) {
+		if (i == "0") {
+			return 0;
+		}
+		return Std.parseInt(i);
+	}
 }

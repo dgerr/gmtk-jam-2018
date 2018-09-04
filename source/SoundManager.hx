@@ -25,6 +25,7 @@ class SoundManager {
 		soundMap["advance"] = "assets/sounds/advance.mp3";
 		soundMap["victory"] = "assets/sounds/victory.mp3";
 		soundMap["puff"] = "assets/sounds/puff.mp3";
+		soundMap["tile"] = "assets/sounds/tile.mp3";
 
 		soundMap["shrine"] = "assets/music/shrine.mp3";
 		soundMap["overworld"] = "assets/music/silly_song4.mp3";
@@ -47,8 +48,10 @@ class SoundManager {
 			return;
 		}
 		var volume:Float = 1.0;
+		if (soundName == "victory") volume = 0.1;
+		if (soundName == "tile") volume = 0.1;
 		if (soundName == "puff") volume = 0.15;
-		if (soundName == "advance") volume = 0.3;
+		if (soundName == "advance") volume = 0.2;
 		FlxG.sound.load(soundMap[soundName], volume).play();
 	}
 }

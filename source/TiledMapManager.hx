@@ -165,7 +165,8 @@ class TiledMapManager {
 			for (j in 0...10) {
 				builtParamsArray[i].push(["x" => Std.string(j), "y" => Std.string(i)]);
 				for (param in params) {
-					if (Std.parseInt(param["tx"]) == x && Std.parseInt(param["ty"]) == y && Std.parseInt(param["x"]) == j && Std.parseInt(param["y"]) == i) {
+					if (Utilities.parseInt(param["tx"]) == x && Utilities.parseInt(param["ty"]) == y &&
+					    Utilities.parseInt(param["x"]) == j && Utilities.parseInt(param["y"]) == i) {
 						builtParamsArray[i][j] = param;
 					}
 				}

@@ -4,9 +4,12 @@ import flixel.FlxSprite;
 import openfl.Assets;
 import openfl.display.BitmapData;
 import openfl.geom.Matrix;
+import openfl.utils.Object;
 
 class Player extends WorldObject {
 	public var spriteData:BitmapData;
+	
+	public var tileCoords:Object;
 	
 	public var keyIndicator:FlxSprite;
 	public var keyIndicatorAttached:Bool = false;

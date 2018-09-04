@@ -75,6 +75,15 @@ class Tile extends FlxSpriteGroup {
 					var isWorldObject = false;
 					var woBitmapData:BitmapData = null;
 					var woAnimationFrames:Int = 0;
+					if (source[i][j] == 380 && !GameState.get().seenEndCutscene) {
+						for (obj in WorldConstants.shrineLocationMap) {
+							if (obj.tx == playerRef.tileCoords.x && obj.ty == playerRef.tileCoords.y && obj.x == j && obj.y == i &&
+							    GameState.get().shrineProgress.exists(obj.id)) {
+								source[i][j] = 377;
+								break;
+							}
+						}
+					}
 					if (source[i][j] == 339) {
 						// zombie cat
 						var zombieCat:ZombieCat = new ZombieCat(["x" => Std.string(j), "y" => Std.string(i), "ox" => Std.string(j), "oy" => Std.string(i)]);

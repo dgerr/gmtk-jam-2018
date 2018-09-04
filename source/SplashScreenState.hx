@@ -38,17 +38,22 @@ class SplashScreenState extends FlxTransitionableState {
 		
 		FlxTransitionableState.defaultTransIn = new TransitionData();
 		FlxTransitionableState.defaultTransOut = new TransitionData();
-		
+
 		var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
 		diamond.persist = true;
 		diamond.destroyOnNoUse = false;
 		
 		FlxTransitionableState.defaultTransIn.color = FlxColor.BLACK;
 		FlxTransitionableState.defaultTransOut.color = FlxColor.BLACK;
+		#if html5
+		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.FADE;
+		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.FADE;
+		#else
 		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.TILES;
 		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.TILES;
 		FlxTransitionableState.defaultTransIn.tileData = { asset: diamond, width: 32, height: 32 };
 		FlxTransitionableState.defaultTransOut.tileData = { asset: diamond, width: 32, height: 32 };
+		#end
 		transOut = FlxTransitionableState.defaultTransOut;
 	}
 

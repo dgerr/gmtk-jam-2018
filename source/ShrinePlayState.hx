@@ -14,11 +14,11 @@ class ShrinePlayState extends AbstractPlayState {
 		
 		TiledMapManager.get().loadTileSet(shrineID);
 		
-		tileCoords = {x: WorldConstants.shrineInfo[shrineID].tx_start, y: WorldConstants.shrineInfo[shrineID].ty_start};
+		p.tileCoords = {x: WorldConstants.shrineInfo[shrineID].tx_start, y: WorldConstants.shrineInfo[shrineID].ty_start};
 		p.loc = {x: WorldConstants.shrineInfo[shrineID].x_start, y: WorldConstants.shrineInfo[shrineID].y_start};
 		respawnTileCoords = Utilities.cloneDirection(p.loc);
 
-		currentTile = new Tile(p, TiledMapManager.get().getTileObject(tileCoords.x, tileCoords.y));
+		currentTile = new Tile(p, TiledMapManager.get().getTileObject(p.tileCoords.x, p.tileCoords.y));
 		
 		backgroundLayer.add(currentTile);
 		snapPlayerToTile();
@@ -51,7 +51,7 @@ class ShrinePlayState extends AbstractPlayState {
 		// check red squares
 		if (tileInfo.bg == 289) {
 			currentTile.setSquare(p.loc, 290);
-			SoundManager.get().playSound("step");
+			SoundManager.get().playSound("tile");
 		} else if (tileInfo.bg == 290) {
 			currentTile.changeAllSquares(289, 314);
 			currentTile.changeAllSquares(290, 314);
@@ -143,16 +143,16 @@ class ShrinePlayState extends AbstractPlayState {
 	}
 
 	private override function startShift() {
-		tileCoords.x += playerDirection.x;
-		tileCoords.y += playerDirection.y;
+		p.tileCoords.x += playerDirection.x;
+		p.tileCoords.y += playerDirection.y;
 		
-		if (!TiledMapManager.get().hasTileObjectAt(tileCoords.x, tileCoords.y)) {
+		if (!TiledMapManager.get().hasTileObjectAt(p.tileCoords.x, p.tileCoords.y)) {
 			state = State.Locked;
 			FlxG.switchState(new OverworldPlayState());
 			return;
 		}
-		tileCoords.x -= playerDirection.x;
-		tileCoords.y -= playerDirection.y;
+		p.tileCoords.x -= playerDirection.x;
+		p.tileCoords.y -= playerDirection.y;
 		savePassedChecks = false;
 		super.startShift();
 	}
