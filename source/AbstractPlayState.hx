@@ -8,7 +8,6 @@ import flixel.util.FlxColor;
 import openfl.Assets;
 import openfl.utils.Object;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.addons.transition.FlxTransitionSprite.GraphicTransTileDiamond;
 import flixel.addons.transition.TransitionData;
 
 enum State {
@@ -75,6 +74,21 @@ class AbstractPlayState extends FlxTransitionableState {
 		animatingObjects = new Array<WorldObject>();
 		animatedObjects = new Array<WorldObject>();
 		animatingDirections = new Array<Object>();
+
+		// Don't use the default FlxGraphics, because they don't load correctly in HTML5
+		var diamond:FlxGraphic = FlxGraphic.fromBitmapData(Assets.getBitmapData("assets/images/diamond.png"));
+		diamond.persist = true;
+		diamond.destroyOnNoUse = false;
+		
+		FlxTransitionableState.defaultTransIn = new TransitionData();
+		FlxTransitionableState.defaultTransOut = new TransitionData();
+		FlxTransitionableState.defaultTransIn.color = FlxColor.BLACK;
+		FlxTransitionableState.defaultTransOut.color = FlxColor.BLACK;
+		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.TILES;
+		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.TILES;
+		FlxTransitionableState.defaultTransIn.tileData = { asset: diamond, width: 32, height: 32 };
+		FlxTransitionableState.defaultTransOut.tileData = { asset: diamond, width: 32, height: 32 };
+		transOut = FlxTransitionableState.defaultTransOut;
 		
 		p = new Player();
 		
@@ -88,26 +102,6 @@ class AbstractPlayState extends FlxTransitionableState {
 		keyIndicator.animation.add("z", [0], 1, true);
 		keyIndicator.animation.add("r", [1], 1, true);
 		keyIndicator.animation.play("z");
-		
-		FlxTransitionableState.defaultTransIn = new TransitionData();
-		FlxTransitionableState.defaultTransOut = new TransitionData();
-
-		var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
-		diamond.persist = true;
-		diamond.destroyOnNoUse = false;
-		
-		FlxTransitionableState.defaultTransIn.color = FlxColor.BLACK;
-		FlxTransitionableState.defaultTransOut.color = FlxColor.BLACK;
-		#if html5
-		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.FADE;
-		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.FADE;
-		#else
-		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.TILES;
-		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.TILES;
-		FlxTransitionableState.defaultTransIn.tileData = { asset: diamond, width: 32, height: 32 };
-		FlxTransitionableState.defaultTransOut.tileData = { asset: diamond, width: 32, height: 32 };
-		#end
-		transOut = FlxTransitionableState.defaultTransOut;
 	}
 	
 	private function snapPlayerToTile() {
@@ -417,7 +411,7 @@ class AbstractPlayState extends FlxTransitionableState {
 		
 		for (worldObject in currentTile.worldObjects) {
 			if (worldObject.type == "cannon") {
-				if ((moveCount + Std.parseInt(worldObject.params.get("offset"))) % Std.parseInt(worldObject.params.get("frequency")) == 0) {
+				if ((moveCount + Utilities.parseInt(worldObject.params.get("offset"))) % Utilities.parseInt(worldObject.params.get("frequency")) == 0) {
 					var dirString = worldObject.params.get("direction");
 					var dir = Utilities.directionToObject(dirString);
 					var newLoc = {x: worldObject.loc.x + dir.x, y: worldObject.loc.y + dir.y};
@@ -605,8 +599,8 @@ class AbstractPlayState extends FlxTransitionableState {
 	public function killPlayer() {
 		for (object in currentTile.worldObjects) {
 			if (object.type == "zombie" || object.type == "crate") {
-				object.loc.x = Std.parseInt(object.params["ox"]);
-				object.loc.y = Std.parseInt(object.params["oy"]);
+				object.loc.x = Utilities.parseInt(object.params["ox"]);
+				object.loc.y = Utilities.parseInt(object.params["oy"]);
 				object.x = Tile.REAL_TILE_WIDTH * object.loc.x;
 				object.y = Tile.REAL_TILE_HEIGHT * object.loc.y;
 			}

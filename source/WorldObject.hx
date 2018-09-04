@@ -19,7 +19,7 @@ class WorldObject extends FlxSpriteGroup {
 		this.params = params;
 		
 		if (params != null) {
-			loc = {x: Std.parseInt(params["x"]), y: Std.parseInt(params["y"])};
+			loc = {x: Utilities.parseInt(params["x"]), y: Utilities.parseInt(params["y"])};
 		}
 		_sprite = new FlxSprite();
 		if (bitmapData != null) {

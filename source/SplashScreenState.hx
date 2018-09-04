@@ -7,7 +7,6 @@ import flixel.graphics.FlxGraphic;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.addons.transition.FlxTransitionSprite.GraphicTransTileDiamond;
 import flixel.addons.transition.TransitionData;
 import openfl.Assets;
 
@@ -35,25 +34,19 @@ class SplashScreenState extends FlxTransitionableState {
 		var text = new FlxText(76, 575, 640, "Press Z to start!", 54);
 		text.setFormat("assets/pixelfont.TTF", 54, FlxColor.WHITE);
 		this.add(text);
-		
-		FlxTransitionableState.defaultTransIn = new TransitionData();
-		FlxTransitionableState.defaultTransOut = new TransitionData();
 
-		var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
+		var diamond:FlxGraphic = FlxGraphic.fromBitmapData(Assets.getBitmapData("assets/images/diamond.png"));
 		diamond.persist = true;
 		diamond.destroyOnNoUse = false;
 		
+		FlxTransitionableState.defaultTransIn = new TransitionData();
+		FlxTransitionableState.defaultTransOut = new TransitionData();
 		FlxTransitionableState.defaultTransIn.color = FlxColor.BLACK;
 		FlxTransitionableState.defaultTransOut.color = FlxColor.BLACK;
-		#if html5
-		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.FADE;
-		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.FADE;
-		#else
 		FlxTransitionableState.defaultTransIn.type = flixel.addons.transition.TransitionType.TILES;
 		FlxTransitionableState.defaultTransOut.type = flixel.addons.transition.TransitionType.TILES;
 		FlxTransitionableState.defaultTransIn.tileData = { asset: diamond, width: 32, height: 32 };
 		FlxTransitionableState.defaultTransOut.tileData = { asset: diamond, width: 32, height: 32 };
-		#end
 		transOut = FlxTransitionableState.defaultTransOut;
 	}
 

@@ -36,7 +36,7 @@ class TiledMapManager {
 		
 		var fin = Constants.constantsMap["solid_tiles.csv"][0].split(",");
 		for (i in fin) {
-			collisionMap[Std.parseInt(i)] = true;
+			collisionMap[Utilities.parseInt(i)] = true;
 		}
 	}
 	
@@ -62,17 +62,17 @@ class TiledMapManager {
 				var build1 = [];
 				var build2 = [];
 				for (i in line) {
-					build1.push(Std.parseInt(i));
+					build1.push(Utilities.parseInt(i));
 				}
 				for (i in line2) {
-					build2.push(Std.parseInt(i));
+					build2.push(Utilities.parseInt(i));
 				}
 				
 				if (fin3 != null) {
 					var line3 = fin3[i].split(",");
 					var build3 = [];
 					for (i in line3) {
-						build3.push(Std.parseInt(i));
+						build3.push(Utilities.parseInt(i));
 					}
 					tiledLayer3.push(build3);
 				}
