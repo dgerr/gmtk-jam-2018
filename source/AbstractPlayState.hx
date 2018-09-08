@@ -484,6 +484,9 @@ class AbstractPlayState extends FlxTransitionableState {
 			state = State.StartResolving;
 			startResolveMove();
 		}
+		if (state == State.CastingCane) {
+			state = State.Free;
+		}
 	}
 	
 	public function resolveCast() {
@@ -510,9 +513,6 @@ class AbstractPlayState extends FlxTransitionableState {
 		if (!_left && _right) {
 			playerDirection = {x: 1, y: 0};
 			castCane();
-		}
-		if (state == State.CastingCane) {
-			state = State.Free;
 		}
 	}
 	
