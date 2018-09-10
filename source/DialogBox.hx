@@ -65,6 +65,9 @@ class DialogBox extends FlxSpriteGroup {
 		var advance = FlxG.keys.anyJustPressed([Z, ENTER]);
 		var abort = FlxG.keys.anyJustPressed([LEFT, RIGHT, UP, DOWN, A, S, D, W]);
 		
+		if (FlxG.onMobile) {
+			advance = (FlxG.swipes.length > 0);
+		}
 		if (advance) {
 			if (index < messages.length - 1) {
 				index += 1;

@@ -4,6 +4,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.FlxGraphic;
 import flixel.group.FlxSpriteGroup;
+import flixel.input.FlxSwipe;
 import flixel.util.FlxColor;
 import openfl.Assets;
 import openfl.utils.Object;
@@ -207,13 +208,32 @@ class AbstractPlayState extends FlxTransitionableState {
         var _down = FlxG.keys.anyJustPressed([DOWN, S]) || (lockMoveFrameCount == 0 && FlxG.keys.anyPressed([DOWN, S]));
         var _left = FlxG.keys.anyJustPressed([LEFT, A]) || (lockMoveFrameCount == 0 && FlxG.keys.anyPressed([LEFT, A]));
         var _right = FlxG.keys.anyJustPressed([RIGHT, D]) || (lockMoveFrameCount == 0 && FlxG.keys.anyPressed([RIGHT, D]));
+		var _pressedZ = FlxG.keys.anyJustPressed([Z]);
+		
+		if (FlxG.onMobile) {
+			for (swipe in FlxG.swipes) {
+				if (swipe.distance > 40) {
+					if (swipe.angle < -135 || swipe.angle > 135) {
+						_down = true;
+					} else if (swipe.angle < -45) {
+						_left = true;
+					} else if (swipe.angle < 45) {
+						_up = true;
+					} else {
+						_right = true;
+					}
+				} else {
+					_pressedZ = true;
+				}
+			}
+		}
 		
 		if (showingDialogBox) {
 			dialogBox.handleInput();
 			return;
 		}
-		
-		if (FlxG.keys.anyJustPressed([Z]) && (state == State.Free || state == State.CastingCane)) {
+
+		if (_pressedZ && (state == State.Free || state == State.CastingCane)) {
 			state = State.Free;
 			searchForDialog();
 		}
@@ -640,7 +660,7 @@ class AbstractPlayState extends FlxTransitionableState {
 			} else if (!GameState.get().shrineProgress.exists("shrine3")) {
 				return ["Good to see you again!", "Looking for another shrine? Try wandering to the north."];
 			} else if (!GameState.get().shrineProgress.exists("shrine2")) {
-				return ["Ah, you look like you're doing well!", "Looking for another shrine? Try wandering to the northwest."];
+				return ["Ah, you look like you're doing well!", "Looking for another shrine? Try wandering to the southwest."];
 			}
 			return ["Unfortunately, I'm an old cat. I haven't the energy to explore the world anymore. You'll need to find the other shrines on your own."];
 		} else if (type == "guard") {
