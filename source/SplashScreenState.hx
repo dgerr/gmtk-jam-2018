@@ -52,7 +52,7 @@ class SplashScreenState extends FlxTransitionableState {
 
 	public override function update(elapsed:Float) {
 		super.update(elapsed);
-		#if desktop
+		#if (web || desktop)
 		if (!starting && (FlxG.keys.anyJustPressed([Z, ENTER]) || (FlxG.onMobile && FlxG.swipes.length > 0))) {
 			FlxG.switchState(new OverworldPlayState());
 		}
